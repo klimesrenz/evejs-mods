@@ -31,7 +31,7 @@ try:
 
         class SkyhookPiWindow(Window):
             default_windowID = 'EveJSSkyhookPI'
-            default_caption = 'Skyhook PI 0.1.8'
+            default_caption = 'Skyhook PI 0.1.9'
             default_width = 1100
             default_height = 570
             default_minSize = (1000, 500)
@@ -134,11 +134,10 @@ try:
                         capacity = row['config']['capacityPerProduct'] * len(row['products'])
                         total = sum(p['quantity'] for p in row['products'])
                         percent = 100.0 * total / capacity if capacity else 0
-                        mark = u'▶ ' if self._selectedHook is row else u''
-                        label = u'%s%s<t>%s [%s]<t>%s<t>%.0f%% (%s/%s)' % (mark, _pi_text(self.SystemName(row)),
+                        label = u'%s<t>%s [%s]<t>%s<t>%.0f%% (%s/%s)' % (_pi_text(self.SystemName(row)),
                             _pi_text(row.get('planetName', row['planetID'])), row['itemID'], self.StateName(row),
                             percent, self.Filled(row), len(row['products']))
-                        entries.append(GetFromClass(Generic, {'label': label, 'piHook': row, 'OnClick': self.SelectHook}))
+                        entries.append(GetFromClass(Generic, {'label': label, 'piHook': row, 'selected': self._selectedHook is row, 'OnClick': self.SelectHook}))
                     self.hookGrid.Load(contentList=entries, headers=[u'Система', u'Планета / ID', u'Состояние', u'Склад / полных'],
                         noContentHint=u'Нет скайхуков для выбранных фильтров.')
                     self.RenderProducts()
@@ -146,8 +145,11 @@ try:
                     self._rendering = False
 
             def SelectHook(self, entry, *args):
-                self._selectedHook = entry.sr.node.piHook
-                self.RenderHooks()
+                row = entry.sr.node.piHook
+                if self._selectedHook and self._selectedHook['itemID'] == row['itemID']:
+                    return
+                self._selectedHook = row
+                self.RenderProducts()
 
             def RenderProducts(self):
                 row = self._selectedHook
@@ -164,9 +166,9 @@ try:
                     self.details.text = u'%s — %s [%s]<br>%s; весь набор P1' % (_pi_text(self.SystemName(row)),
                         _pi_text(row.get('planetName', row['planetID'])), row['itemID'], self.StateName(row))
                     for product in row['products']:
-                        mark = u'▶ ' if self._selected and self._selected[1]['typeID'] == product['typeID'] else u''
-                        label = u'%s%s<t>%s / %s<t>%.1f' % (mark, _pi_text(product['name']), product['quantity'], cfg['capacityPerProduct'], rate)
-                        entries.append(GetFromClass(Generic, {'label': label, 'piRow': (row, product), 'OnClick': self.Select}))
+                        selected = bool(self._selected and self._selected[1]['typeID'] == product['typeID'])
+                        label = u'%s<t>%s / %s<t>%.1f' % (_pi_text(product['name']), product['quantity'], cfg['capacityPerProduct'], rate)
+                        entries.append(GetFromClass(Generic, {'label': label, 'piRow': (row, product), 'selected': selected, 'OnClick': self.Select}))
                 else:
                     self.details.text = u'Выберите скайхук.'
                 self.productGrid.Load(contentList=entries, headers=[u'P1', u'Запас', u'В час при работе'], noContentHint=u'Выберите скайхук слева.')
@@ -174,7 +176,7 @@ try:
 
             def Select(self, entry, *args):
                 self._selected = entry.sr.node.piRow
-                self.RenderProducts()
+                self.UpdateControls()
 
             def RangeState(self):
                 row = self._selectedHook
@@ -418,9 +420,9 @@ try:
                     result = _pi_json.loads(sm.RemoteSvc('planetMgr').SkyhookPiReady())
                     if not self.current() or generation != self.generation:
                         return
-                    if result.get('ok') and result.get('version') == '0.1.8':
+                    if result.get('ok') and result.get('version') == '0.1.9':
                         self.ready = True
-                        print('SKYHOOK_PI:READY:0.1.8')
+                        print('SKYHOOK_PI:READY:0.1.9')
                         return
                 except Exception:
                     pass

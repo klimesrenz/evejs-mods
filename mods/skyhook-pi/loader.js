@@ -70,7 +70,7 @@ function install(root=path.resolve(__dirname,'../..')){
   getService,close(){if(closed)return;closed=true;clearInterval(timer);if(Module._load===hookedLoad)Module._load=previousLoad;if(Module._extensions['.js']===hookedExtension)Module._extensions['.js']=previousExtension;for(const undo of restorers.reverse())undo();store.close();state.active=false;delete globalThis[MARK];}};
  globalThis[MARK]=state;Module._extensions['.js']=hookedExtension;Module._load=hookedLoad;
  process.once('exit',()=>{if(!closed)store.close();});
- console.log('[SkyhookPI] 0.1.8 loaded; !skyhookpi');return state;
+ console.log('[SkyhookPI] 0.1.9 loaded; !skyhookpi');return state;
 }
 module.exports={install};
 if(process.env.EVEJS_SKYHOOK_PI_NO_AUTOINSTALL!=='1')install();
