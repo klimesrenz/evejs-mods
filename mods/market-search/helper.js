@@ -7,7 +7,7 @@ function execute(request) {
   if (!ACTIONS.has(request.action)) throw Error("Unsupported Market Search helper action.");
   const removing = ["prepare_disable", "prepare_remove"].includes(request.action);
   if (!removing) {
-    if ((request.runtime.backend || "native") !== "native") throw Error("Market Search 0.1.3 supports Native only.");
+    if ((request.runtime.backend || "native") !== "native") throw Error("Market Search 0.1.4 supports Native only.");
     if (Number(process.versions.node.split(".")[0]) < 24) throw Error("Node.js 24+ is required.");
     const root = request.runtime.evejsRoot || request.mod.root;
     validateRoot(root);

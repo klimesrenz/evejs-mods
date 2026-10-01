@@ -44,7 +44,7 @@ function install(root = path.resolve(__dirname, "../..")) {
       exports.prototype.Handle_MarketSearchReady = function(args, session) {
         const valid = session && Number(session.characterID || session.charid) > 0;
         if (valid) clients.add(session);
-        return JSON.stringify({ success: !!valid, version: "0.1.3" });
+        return JSON.stringify({ success: !!valid, version: "0.1.4" });
       };
       exports.prototype.Handle_MarketSearchFind = search;
     } else if (kind === "chat" && typeof exports.executeChatCommand === "function") {
@@ -74,7 +74,7 @@ function install(root = path.resolve(__dirname, "../..")) {
     return exports;
   };
   globalThis[KEY] = { active: true };
-  console.log("[MarketSearch] 0.1.3 loaded. /marketfind or !marketfind opens the in-game window.");
+  console.log("[MarketSearch] 0.1.4 loaded. /marketfind or !marketfind opens the in-game window.");
   return globalThis[KEY];
 }
 module.exports = { install, command };
