@@ -1,0 +1,35 @@
+{
+  "upstream": "cf368846f444",
+  "files": {
+    "server/src/services/planet/planetOrbitalState.js": "d912391ab1f36085cad92c38f7a3590940493e8372bcfa9220a982708137c12f",
+    "server/src/services/inventory/itemStore.js": [
+      "91688dc8830daf35b300d0e2f9b4380910934f6850748f02636c862a95d06165",
+      "da765dd9d5ef8eafe9d31900f5d5d2ec3f0e3ca1efabcb9f0d685d06ea823d42"
+    ],
+    "server/src/services/ship/orbitalLaunchRuntime.js": "d2ed7637b188420886733a91fd1bc1b62ea7d81f61c36c946cb02bb9116bc4b8",
+    "server/src/services/planet/planetStaticData.js": "07d7b6e2f2b78b384440588860bd30f3c21d7afcb7fb6b584956cf788693a790",
+    "server/src/services/planet/planetMgrService.js": "a51c1bfb7abd2f99ab1d8ba2bbc1ca09f8f48e446c7da7a4bb04f95cd2f7b724",
+    "server/src/services/inventory/specialShipHoldRegistry.js": "84c58c94795180cca1431eeaa226611feace9ea0d881813fa940e9cf45bf9238",
+    "server/src/services/corporation/corporationState.js": "14fab49554b1a58d67237be649ab059703c4d9efd3b15b54ad88216df9f23080",
+    "server/src/services/corporation/corporationRuntimeState.js": "3a436534b094320d2708237733d5ea0de805f9b8390e41b6eae905dee1ae0cfd",
+    "server/src/services/character/characterState.js": [
+      "4c48e5ce66adaf4dfcfd44b3f043ccb6d3278c345dae4e38973d8866c3eac25d",
+      "7a6d0af5631e2127d99af41c7802b3407d68b1916e76955d3a493dd30a702f3e"
+    ],
+    "server/src/services/sovereignty/sovPlayerDeployment.js": [
+      "aef14f5f93150ec90ecafb29e0cb6cf91a309e7e797574380de917645f2c3082",
+      "0d530e4267b016f64856466d790fff9b77fd47bd29ff67e618508ff338395184"
+    ],
+    "server/src/network/tcp/handshake.js": "4fc3c37ec83c443c1497a3daba57d7157d05bbe55af3be2d5545b6162398ebc9",
+    "server/bootstrap.js": [
+      "46270822e960002b1546a94226aced98824e0a9b9c0b37bd52420c58591c3a94",
+      "9a1a90694b3e898df5ebd6a8b48e9965b60f0bb6347ecff8059e01aa5aa6c991"
+    ]
+  },
+  "additionalSourceRevisions": {
+    "server/src/services/inventory/itemStore.js": "082916b3db47",
+    "server/src/services/character/characterState.js": "67053b412e09",
+    "server/src/services/sovereignty/sovPlayerDeployment.js": "5267249207c0",
+    "server/bootstrap.js": "67053b412e09"
+  }
+}

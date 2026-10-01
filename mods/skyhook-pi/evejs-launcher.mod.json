@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 3,
+  "id": "skyhook-pi",
+  "displayName": "Skyhook PI",
+  "version": "0.1.7",
+  "description": "Automatic planet-specific P1 production at player-deployed Skyhooks.",
+  "kind": "loader",
+  "supportedBackends": [
+    "native"
+  ],
+  "activation": {
+    "strategy": "loader_rename"
+  },
+  "restart": "game_server",
+  "compatibility": {
+    "evejsVersions": [
+      "0.12.9",
+      "0.12.19"
+    ]
+  },
+  "launcherApi": {
+    "version": 1,
+    "minLauncherVersion": "1.0.69",
+    "helper": {
+      "runtime": "node",
+      "path": "helper.js"
+    },
+    "capabilities": [
+      "install",
+      "verify",
+      "prepare_profile",
+      "prepare_disable",
+      "prepare_remove",
+      "recover"
+    ]
+  },
+  "clientMenu": {
+    "apiVersion": 1,
+    "entrypoint": "client/menu.py"
+  },
+  "updates": {
+    "provider": "github",
+    "repository": "klimesrenz/evejs-mods",
+    "asset": "SkyhookPI-{version}.zip",
+    "channel": "stable",
+    "tagPrefix": "skyhook-pi-v",
+    "preserveFiles": []
+  }
+}
