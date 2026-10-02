@@ -31,7 +31,7 @@ try:
 
         class SkyhookPiWindow(Window):
             default_windowID = 'EveJSSkyhookPI'
-            default_caption = 'Skyhook PI 0.1.9'
+            default_caption = 'Skyhook PI 0.1.10'
             default_width = 1100
             default_height = 570
             default_minSize = (1000, 500)
@@ -97,6 +97,16 @@ try:
                     row['_systemName'] = unicode(name)
                 return row['_systemName']
 
+            def PlanetTypeName(self, row):
+                try:
+                    import evetypes
+                    name = unicode(evetypes.GetName(int(row['planetTypeID'])))
+                    if name.startswith(u'Planet (') and name.endswith(u')'):
+                        return name[8:-1]
+                    return name or u'Неизвестный тип'
+                except Exception:
+                    return u'Неизвестный тип'
+
             def StateName(self, row):
                 return {'running': u'Работает', 'paused': u'Пауза', 'not_configured': u'Не настроен',
                         'destroyed': u'Уничтожен'}.get(row['status'], row['status'])
@@ -135,10 +145,10 @@ try:
                         total = sum(p['quantity'] for p in row['products'])
                         percent = 100.0 * total / capacity if capacity else 0
                         label = u'%s<t>%s [%s]<t>%s<t>%.0f%% (%s/%s)' % (_pi_text(self.SystemName(row)),
-                            _pi_text(row.get('planetName', row['planetID'])), row['itemID'], self.StateName(row),
+                            _pi_text(row.get('planetName', row['planetID'])), _pi_text(self.PlanetTypeName(row)), self.StateName(row),
                             percent, self.Filled(row), len(row['products']))
                         entries.append(GetFromClass(Generic, {'label': label, 'piHook': row, 'selected': self._selectedHook is row, 'OnClick': self.SelectHook}))
-                    self.hookGrid.Load(contentList=entries, headers=[u'Система', u'Планета / ID', u'Состояние', u'Склад / полных'],
+                    self.hookGrid.Load(contentList=entries, headers=[u'Система', u'Планета / тип', u'Состояние', u'Склад / полных'],
                         noContentHint=u'Нет скайхуков для выбранных фильтров.')
                     self.RenderProducts()
                 finally:
@@ -164,7 +174,7 @@ try:
                     cfg = row['config']
                     rate = float(cfg['amountPerCycle']) * 3600000 / cfg['cycleMs']
                     self.details.text = u'%s — %s [%s]<br>%s; весь набор P1' % (_pi_text(self.SystemName(row)),
-                        _pi_text(row.get('planetName', row['planetID'])), row['itemID'], self.StateName(row))
+                        _pi_text(row.get('planetName', row['planetID'])), _pi_text(self.PlanetTypeName(row)), self.StateName(row))
                     for product in row['products']:
                         selected = bool(self._selected and self._selected[1]['typeID'] == product['typeID'])
                         label = u'%s<t>%s / %s<t>%.1f' % (_pi_text(product['name']), product['quantity'], cfg['capacityPerProduct'], rate)
@@ -420,9 +430,9 @@ try:
                     result = _pi_json.loads(sm.RemoteSvc('planetMgr').SkyhookPiReady())
                     if not self.current() or generation != self.generation:
                         return
-                    if result.get('ok') and result.get('version') == '0.1.9':
+                    if result.get('ok') and result.get('version') == '0.1.10':
                         self.ready = True
-                        print('SKYHOOK_PI:READY:0.1.9')
+                        print('SKYHOOK_PI:READY:0.1.10')
                         return
                 except Exception:
                     pass
