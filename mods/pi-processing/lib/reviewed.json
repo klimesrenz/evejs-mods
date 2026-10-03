@@ -1,0 +1,33 @@
+{
+  "upstream": "8bf211468",
+  "files": {
+    "server/src/services/inventory/itemStore.js": [
+      "da765dd9d5ef8eafe9d31900f5d5d2ec3f0e3ca1efabcb9f0d685d06ea823d42",
+      "5c92395a09ce81bc5a3b6e9cec9503831c468d3a50ecaeaf96bdd7c9220831ac"
+    ],
+    "server/src/services/character/characterState.js": [
+      "4c48e5ce66adaf4dfcfd44b3f043ccb6d3278c345dae4e38973d8866c3eac25d",
+      "7a6d0af5631e2127d99af41c7802b3407d68b1916e76955d3a493dd30a702f3e"
+    ],
+    "server/src/services/planet/planetStaticData.js": [
+      "07d7b6e2f2b78b384440588860bd30f3c21d7afcb7fb6b584956cf788693a790"
+    ],
+    "server/src/services/planet/planetMgrService.js": [
+      "a51c1bfb7abd2f99ab1d8ba2bbc1ca09f8f48e446c7da7a4bb04f95cd2f7b724"
+    ],
+    "server/src/services/structure/structureLocation.js": [
+      "c80fbb01eab7a7b43d089a69c0a371761489f18ed70dbf5ec5d7461fd64eca17"
+    ],
+    "server/src/services/structure/structureState.js": [
+      "6478bb7503f0ff449da9ac9fd35f5ea27a33d37fd882d18651c5d33b2ddef996",
+      "255f0598fc09898b3bc37a03c339cea6cdcb25ec3a3b60dbd82a468df4ca17c7",
+      "e99e24bc1eb0888d5e043708d4cee1f6c8a23f1681916311c4fe4cfd56252f48"
+    ],
+    "server/src/space/worldData.js": [
+      "923446d2988e237c62a12d6f2cc156491aa4a417203a38a1e2afc4e8d752eca4"
+    ],
+    "server/src/network/tcp/handshake.js": [
+      "4fc3c37ec83c443c1497a3daba57d7157d05bbe55af3be2d5545b6162398ebc9"
+    ]
+  }
+}
