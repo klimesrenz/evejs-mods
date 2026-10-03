@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 3,
+  "id": "pi-processing",
+  "displayName": "PI Processing",
+  "version": "0.1.0",
+  "description": "Station and structure PI processing with persistent offline jobs.",
+  "kind": "loader",
+  "supportedBackends": [
+    "native"
+  ],
+  "activation": {
+    "strategy": "loader_rename"
+  },
+  "restart": "game_server",
+  "compatibility": {
+    "evejsVersions": [
+      "0.12.9",
+      "0.12.19"
+    ]
+  },
+  "launcherApi": {
+    "version": 1,
+    "minLauncherVersion": "1.0.69",
+    "helper": {
+      "runtime": "node",
+      "path": "helper.js"
+    },
+    "capabilities": [
+      "install",
+      "verify",
+      "prepare_profile",
+      "prepare_disable",
+      "prepare_remove",
+      "recover"
+    ]
+  },
+  "clientMenu": {
+    "apiVersion": 1,
+    "entrypoint": "client/menu.py"
+  },
+  "updates": {
+    "provider": "github",
+    "repository": "klimesrenz/evejs-mods",
+    "asset": "PIProcessing-{version}.zip",
+    "channel": "stable",
+    "tagPrefix": "pi-processing-v",
+    "preserveFiles": []
+  }
+}

@@ -1,4 +1,5 @@
 """Build installable ZIPs and Launcher update metadata using the standard library."""
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -8,6 +9,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = 'klimesrenz/evejs-mods'
 MODS = {
+    'pi-processing': ('PIProcessing-{version}.zip', 'pi-processing-v'),
     'skyhook-pi': ('SkyhookPI-{version}.zip', 'skyhook-pi-v'),
     'market-search': ('MarketSearch-{version}.zip', 'market-search-v'),
 }
@@ -58,8 +60,13 @@ def build(name, pattern, prefix):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--mod', choices=sorted(MODS))
+    args = parser.parse_args()
+    selected = [args.mod] if args.mod else list(MODS)
     outputs = []
-    for name, (pattern, prefix) in MODS.items():
+    for name in selected:
+        pattern, prefix = MODS[name]
         outputs.extend(build(name, pattern, prefix))
     sums = ''.join(hashlib.sha256(file.read_bytes()).hexdigest() + '  ' + file.name + '\n'
                    for file in outputs)

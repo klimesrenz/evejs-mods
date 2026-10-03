@@ -12,6 +12,7 @@ function buildCatalogue(api) {
       if (!type || type.published === false) throw Error('PI_TYPE_UNAVAILABLE:'+e.typeID);
       return {typeID:e.typeID, quantity:e.quantity};
     });
+    if(new Set(s.inputs.map(e=>e.typeID)).size!==s.inputs.length)throw Error('INVALID_PI_SCHEMATIC');
     rows.push({schematicID:positive(s.schematicID),tier:api.getCommodityTier(s.outputs[0].typeID),
       name:String(api.getType(s.outputs[0].typeID)?.name || s.outputs[0].typeID),
       cycleMs:positive(s.cycleTime * 1000),inputs:entries(s.inputs),outputs:entries(s.outputs)});

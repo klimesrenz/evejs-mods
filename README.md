@@ -1,10 +1,11 @@
 # EveJS Mods
 
-Моды для нативного EveJS Launcher: **Skyhook PI** и **Market Search**.
+Моды для нативного EveJS Launcher: **Skyhook PI**, **Market Search** и **PI Processing**.
 Минимальная версия Launcher — 1.0.69, Node.js — 24.
 
 | Мод | Назначение | Инструкция |
 | --- | --- | --- |
+| PI Processing | Переработка P2–P4 в личном ангаре с офлайн-таймером | [README](mods/pi-processing/README.md) |
 | Skyhook PI | Автоматическое производство P1 через скайхуки, отдельный склад и ручной сбор кораблём | [README](mods/skyhook-pi/README.md) |
 | Market Search | Поиск NPC-продаж, расстояния и назначение маршрута | [README](mods/market-search/README.md) |
 
@@ -53,3 +54,7 @@ python tools/build_release.py
 используйте Check mod updates → Update, без повторного Add ZIP.
 Перед установкой остановите сервер и закройте клиент. После перезапуска
 проверьте заголовки окон, остатки PI с учётом циклов/паузы и обычный поиск.
+
+Для отдельной сборки PI Processing: `python tools/build_release.py --mod pi-processing`.
+Первый пакет 0.1.0 требует клиентской приёмки на Windows; локальные проверки
+не заменяют запуск в EVE. Задания хранятся в `_local/mods/pi-processing/state.sqlite`.
