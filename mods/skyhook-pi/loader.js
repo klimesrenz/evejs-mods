@@ -20,7 +20,7 @@ function install(root=path.resolve(__dirname,'../..')){
   return {active:false,reason:'not-world-entrypoint'};
  }
  if(globalThis[MARK])return globalThis[MARK];assertRoot(root);
- const relative={bootstrap:'server/bootstrap.js',planet:'server/src/services/planet/planetOrbitalState.js',items:'server/src/services/inventory/itemStore.js',launch:'server/src/services/ship/orbitalLaunchRuntime.js',rpc:'server/src/services/planet/planetMgrService.js',packet:'server/src/network/tcp/utils/marshal.js',chat:'server/src/services/chat/chatCommands.js',plain:'server/src/_secondary/chat/chatRuntime.js'};
+ const relative={broker:'server/src/services/inventory/invBrokerService.js',bootstrap:'server/bootstrap.js',planet:'server/src/services/planet/planetOrbitalState.js',items:'server/src/services/inventory/itemStore.js',launch:'server/src/services/ship/orbitalLaunchRuntime.js',rpc:'server/src/services/planet/planetMgrService.js',packet:'server/src/network/tcp/utils/marshal.js',chat:'server/src/services/chat/chatCommands.js',plain:'server/src/_secondary/chat/chatRuntime.js'};
  const targets=new Map(Object.entries(relative).map(([k,v])=>[canonical(path.join(root,v)),k]));
  for(const file of Object.keys(require.cache))if(targets.has(canonical(file)))throw Error('PRELOAD_REQUIRED');
  const settingsPath=path.join(root,'config/skyhook-pi.config.json');
@@ -42,7 +42,7 @@ function install(root=path.resolve(__dirname,'../..')){
  const previousLoad=Module._load,previousExtension=Module._extensions['.js'];
  const restorers=[],seen=new WeakSet();
  function hookedExtension(mod,filename){
-  const kind=targets.get(canonical(filename));if(!['planet','items','launch','bootstrap'].includes(kind))return previousExtension.apply(this,arguments);
+  const kind=targets.get(canonical(filename));if(!['planet','broker','items','launch','bootstrap'].includes(kind))return previousExtension.apply(this,arguments);
   const originalCompile=mod._compile;
   mod._compile=function(source,file){return originalCompile.call(this,transform(kind,source),file);};
   try{return previousExtension.apply(this,arguments);}finally{mod._compile=originalCompile;}
@@ -70,7 +70,7 @@ function install(root=path.resolve(__dirname,'../..')){
   getService,close(){if(closed)return;closed=true;clearInterval(timer);if(Module._load===hookedLoad)Module._load=previousLoad;if(Module._extensions['.js']===hookedExtension)Module._extensions['.js']=previousExtension;for(const undo of restorers.reverse())undo();store.close();state.active=false;delete globalThis[MARK];}};
  globalThis[MARK]=state;Module._extensions['.js']=hookedExtension;Module._load=hookedLoad;
  process.once('exit',()=>{if(!closed)store.close();});
- console.log('[SkyhookPI] 0.1.10 loaded; !skyhookpi');return state;
+ console.log('[SkyhookPI] 0.1.11 loaded; !skyhookpi');return state;
 }
 module.exports={install};
 if(process.env.EVEJS_SKYHOOK_PI_NO_AUTOINSTALL!=='1')install();

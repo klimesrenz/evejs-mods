@@ -24,12 +24,14 @@
     "server/bootstrap.js": [
       "46270822e960002b1546a94226aced98824e0a9b9c0b37bd52420c58591c3a94",
       "9a1a90694b3e898df5ebd6a8b48e9965b60f0bb6347ecff8059e01aa5aa6c991"
-    ]
+    ],
+    "server/src/services/inventory/invBrokerService.js": "8f99094a1d55ed936dcae42d1b4e184fe274c4be1056f2b95e45901af60675b6"
   },
   "additionalSourceRevisions": {
     "server/src/services/inventory/itemStore.js": "082916b3db47",
     "server/src/services/character/characterState.js": "67053b412e09",
     "server/src/services/sovereignty/sovPlayerDeployment.js": "5267249207c0",
-    "server/bootstrap.js": "67053b412e09"
+    "server/bootstrap.js": "67053b412e09",
+    "server/src/services/inventory/invBrokerService.js": "dc28e8b087a24692b28bbd21c339fafe81baf657"
   }
 }

@@ -31,7 +31,7 @@ try:
 
         class SkyhookPiWindow(Window):
             default_windowID = 'EveJSSkyhookPI'
-            default_caption = 'Skyhook PI 0.1.10'
+            default_caption = 'Skyhook PI 0.1.11'
             default_width = 1100
             default_height = 570
             default_minSize = (1000, 500)
@@ -430,9 +430,9 @@ try:
                     result = _pi_json.loads(sm.RemoteSvc('planetMgr').SkyhookPiReady())
                     if not self.current() or generation != self.generation:
                         return
-                    if result.get('ok') and result.get('version') == '0.1.10':
+                    if result.get('ok') and result.get('version') == '0.1.11':
                         self.ready = True
-                        print('SKYHOOK_PI:READY:0.1.10')
+                        print('SKYHOOK_PI:READY:0.1.11')
                         return
                 except Exception:
                     pass

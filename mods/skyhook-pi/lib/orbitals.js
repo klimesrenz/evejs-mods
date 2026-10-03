@@ -8,8 +8,23 @@ function transform(kind,input){
  if(kind==='planet') {
    source=replaceOnce(source,'listOrbitalsForSystem(numericSystemID)\n      .map', 'listOrbitalsForSystem(numericSystemID)\n      .filter(record => Number(record.typeID) !== 81080)\n      .map');
    source=replaceOnce(source,'if (listOrbitalsForPlanet(planetID).length > 0)', 'if (listOrbitalsForPlanet(planetID).some(record => Number(record.typeID) !== 81080))');
+   // The retail menu and Launchpad both require the Activate component.
+   source=replaceOnce(source,'  entity.orbitalHackerID = null;',`  if (Number(record.typeID) === 81080) {
+    const piActive = !isOrbitalRecordDestroyed(record) &&
+      [ORBITAL_STATE.IDLE, ORBITAL_STATE.OPERATING].includes(record.state);
+    entity.component_activate = [piActive,
+      record.state === ORBITAL_STATE.ONLINING ? entity.orbitalTimestampMs : null];
+  }
+  entity.orbitalHackerID = null;`);
    source=replaceOnce(source,'function writeState(state, options = {}) {',`function writeState(state, options = {}) {\n  ${hook}?.beforeOrbitals(state);`);
    source=replaceOnce(source,'  return flushStateToDisk();\n}',`  const piFlushed = flushStateToDisk();\n  if (piFlushed) ${hook}?.afterOrbitals(normalizedState);\n  return piFlushed;\n}`);
+ } else if(kind==='broker') {
+   source=replaceOnce(source,`      this._normalizeInventoryId(record.groupID, 0) !==
+      planetOrbitalState.GROUP_PLANETARY_CUSTOMS_OFFICES`, `      this._normalizeInventoryId(record.groupID, 0) !==
+        planetOrbitalState.GROUP_PLANETARY_CUSTOMS_OFFICES &&
+      !(Number(record.typeID) === 81080 &&
+        [planetOrbitalState.ORBITAL_STATE.IDLE,
+         planetOrbitalState.ORBITAL_STATE.OPERATING].includes(record.state))`);
  } else if(kind==='items') {
    source=replaceOnce(source,'    const touchedKeys = new Set([...stagedRows.keys(), ...removedRows]);',`    const touchedKeys = new Set([...stagedRows.keys(), ...removedRows]);\n    ${hook}?.beforeItemChanges(baseItems, items, touchedKeys);`);
    source=replaceOnce(source,'    if (committed) {\n      return true;',`    if (committed) {\n      ${hook}?.afterItemChanges(baseItems, touchedKeys);\n      return true;`);

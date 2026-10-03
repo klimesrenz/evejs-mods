@@ -8,7 +8,7 @@ function installRpc(Service,getService){
  }
  const previous=new Map();
  function add(name,fn){if(Service.prototype[name])throw Error('RPC_ALREADY_REGISTERED');previous.set(name,fn);Service.prototype[name]=fn;}
- add('Handle_SkyhookPiReady',function(args,s){if(character(s))ready.set(s,character(s));return JSON.stringify({ok:!!character(s),version:'0.1.10'});});
+ add('Handle_SkyhookPiReady',function(args,s){if(character(s))ready.set(s,character(s));return JSON.stringify({ok:!!character(s),version:'0.1.11'});});
  add('Handle_SkyhookPiList',function(args,s){return run(s,()=>getService().list(s));});
  add('Handle_SkyhookPiAction',function(args,s){return run(s,()=>{
   let raw=Array.isArray(args)?args[0]:null;
