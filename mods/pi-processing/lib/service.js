@@ -39,7 +39,9 @@ function createService({store,authority,inventory,catalogue,clock=Date.now}) {
     start(s,req){
       const ownerID=authority.identity(s),payload={action:'start',schematicID:positive(req.schematicID),batches:positive(req.batches)};
       const old=readRequest(ownerID,req.requestID,payload);if(old)return response(s,settle(owned(s,old.jobID)));
-      const c=authority.dock(s),r=recipe(req.schematicID),q=quoteRecipe(r,req.batches,authority.available(c).totals);
+      const c=authority.dock(s),r=recipe(req.schematicID);
+      if(r.mode==='p1-chain'&&req.mode!==r.mode)throw Error('RECIPE_CHANGED');
+      const q=quoteRecipe(r,req.batches,authority.available(c).totals);
       const id=crypto.randomUUID(),startedAtMs=clock(),requests=authority.select(c,q.inputs);
       if(requests.length>10000)throw Error('TOO_MANY_STACKS');
       const j={...c,id,recipe:structuredClone(r),batches:req.batches,inputs:q.inputs,outputs:q.outputs,status:'starting',startedAtMs,finishAtMs:positive(startedAtMs+q.durationMs),consumeKey:'pi-processing:'+id+':consume',grantKey:'pi-processing:'+id+':grant'};

@@ -1,4 +1,5 @@
 'use strict';
+const {expandChains}=require('./chain');
 const MAX_QUANTITY = 2147483647;
 function positive(value) { if (!Number.isSafeInteger(value) || value <= 0) throw Error('INVALID_QUANTITY'); return value; }
 function buildCatalogue(api) {
@@ -18,7 +19,7 @@ function buildCatalogue(api) {
       cycleMs:positive(s.cycleTime * 1000),inputs:entries(s.inputs),outputs:entries(s.outputs)});
   }
   if (!rows.length) throw Error('PI_SCHEMATICS_UNAVAILABLE');
-  return rows.sort((a,b)=>a.tier-b.tier || a.schematicID-b.schematicID);
+  return expandChains(rows,id=>api.getCommodityTier(id)).sort((a,b)=>a.tier-b.tier || a.schematicID-b.schematicID);
 }
 function quoteRecipe(recipe, batches, available) {
   positive(batches);

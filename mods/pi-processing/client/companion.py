@@ -31,10 +31,10 @@ try:
 
         class PiProcessingWindow(Window):
             default_windowID = 'EveJSPIProcessing'
-            default_caption = u'Переработка PI 0.1.0'
+            default_caption = u'Переработка PI 0.1.1'
             default_width = 1050
-            default_height = 650
-            default_minSize = (950, 580)
+            default_height = 760
+            default_minSize = (950, 680)
             default_isStackable = False
             default_scope = C.SCOPE_INGAME
 
@@ -61,14 +61,17 @@ try:
                 Button(parent=top, align=C.TOLEFT, width=110, label=u'Ещё задания', func=self.More)
                 self.status = EveLabelMedium(parent=self.content, align=C.TOTOP, height=45, maxLines=2, text=u'Материалы и результат — в личном ангаре места запуска.')
                 bottom = Container(parent=self.content, align=C.TOBOTTOM, height=40)
-                EveLabelMedium(parent=bottom, align=C.TOLEFT, width=95, text=u'Циклы:')
+                EveLabelMedium(parent=bottom, align=C.TOLEFT, width=95, text=u'Партии:')
                 self.quantity = SingleLineEditText(parent=bottom, align=C.TOLEFT, width=120, setvalue='1')
                 Button(parent=bottom, align=C.TOLEFT, width=110, label=u'Рассчитать', func=self.Quote)
                 Button(parent=bottom, align=C.TOLEFT, width=110, label=u'Максимум', func=self.Maximum)
                 self.startButton = Button(parent=bottom, align=C.TOLEFT, width=125, label=u'Запустить', func=self.Start)
                 self.collectButton = Button(parent=bottom, align=C.TOLEFT, width=125, label=u'Забрать', func=self.Collect)
                 Button(parent=bottom, align=C.TOLEFT, width=160, label=u'Повторить запрос', func=self.Retry)
-                self.details = EveLabelMedium(parent=self.content, align=C.TOBOTTOM, height=145, maxLines=8, text=u'Выберите продукт.')
+                self.details = EveLabelMedium(parent=self.content, align=C.TOBOTTOM, height=70, maxLines=3, text=u'Выберите конечный продукт. Сырьё — P1.')
+                self.materials = Scroll(parent=self.content, align=C.TOBOTTOM, height=220, multiSelect=False)
+                self.materials.Load(contentList=[], headers=[u'Материал', u'Нужно', u'Есть в ангаре'])
+                self._materialKey = None
                 self.grid = Scroll(parent=self.content, align=C.TOALL, multiSelect=False)
                 self.grid.Load(contentList=[])
                 self.Controls()
@@ -170,8 +173,8 @@ try:
                         name = self.Name(r['outputs'][0]['typeID'])
                         if self.tier.GetValue() not in (0, r['tier']) or term and term not in name.lower():
                             continue
-                        entries.append(GetFromClass(Generic, {'label': u'%s<t>P%s<t>%s мин' % (_pi_text(name), r['tier'], r['cycleMs'] / 60000), 'piRow': r, 'OnClick': self.SelectRecipe}))
-                    headers = [u'Продукт', u'Тир', u'Время партии']
+                        entries.append(GetFromClass(Generic, {'label': u'%s<t>P%s<t>%s<t>%s мин' % (_pi_text(name), r['tier'], r['outputs'][0]['quantity'], r['cycleMs'] / 60000), 'piRow': r, 'OnClick': self.SelectRecipe}))
+                    headers = [u'Продукт', u'Тир', u'Выход партии', u'Время всей цепочки']
                 else:
                     for j in self._jobs:
                         state = { 'starting': u'Восстановление', 'running': u'Готово' if self.Now() >= j['finishAtMs'] else u'Производство', 'delivering': u'Выдача', 'delivered': u'Получено', 'rejected': u'Не запущено' }.get(j['status'], j['status'])
@@ -193,7 +196,7 @@ try:
             def Batches(self):
                 n = int(self.quantity.GetValue())
                 if n <= 0:
-                    raise ValueError(u'Введите положительное число циклов.')
+                    raise ValueError(u'Введите положительное число партий.')
                 return n
 
             def Quote(self, *args):
@@ -213,6 +216,14 @@ try:
                 if self.Valid() and self._recipe is r:
                     self._quote = result
 
+            def Materials(self, rows):
+                key = tuple((e['typeID'], e['quantity'], e.get('available')) for e in rows)
+                if key == self._materialKey:
+                    return
+                self._materialKey = key
+                entries = [GetFromClass(Generic, {'label': u'%s<t>%s<t>%s' % (_pi_text(self.Name(e['typeID'])), e['quantity'], e.get('available', u'—'))}) for e in rows]
+                self.materials.Load(contentList=entries, headers=[u'Материал', u'Нужно', u'Есть в ангаре'], noContentHint=u'Выберите продукт и рассчитайте партию.')
+
             def Controls(self):
                 if self.destroyed:
                     return
@@ -223,15 +234,17 @@ try:
                 if recipes and self._recipe:
                     r = self._recipe
                     q = self._quote
-                    lines = [u'%s — %s мин на всю партию' % (_pi_text(self.Name(r['outputs'][0]['typeID'])), r['cycleMs'] / 60000)]
+                    lines = [u'%s: из P1; %s мин на всю цепочку; %s шт. в партии' % (_pi_text(self.Name(r['outputs'][0]['typeID'])), r['cycleMs'] / 60000, r['outputs'][0]['quantity'])]
                     if q:
-                        lines.extend(u'%s: нужно %s / есть %s' % (_pi_text(self.Name(e['typeID'])), e['quantity'], e['available']) for e in q['inputs'])
-                        lines.append(u'Выход: %s; максимум циклов: %s' % (q['outputs'][0]['quantity'], q['maxBatches']))
+                        self.Materials(q['inputs'])
+                        lines.append(u'Выход: %s; максимум партий: %s' % (q['outputs'][0]['quantity'], q['maxBatches']))
                     else:
-                        lines.append(u'Нажмите «Рассчитать», находясь в доке.')
+                        self.Materials(r['inputs'])
+                        lines.append(u'Показан состав одной партии. Для остатков нажмите «Рассчитать» в доке.')
                     self.details.text = '<br>'.join(lines)
                 elif not recipes and self._job:
                     j = self._job
+                    self.Materials([{'typeID': e['typeID'], 'quantity': e['quantity'] * j['batches']} for e in j['recipe']['inputs']])
                     seconds = max(0, int((j['finishAtMs'] - self.Now()) / 1000))
                     self.details.text = u'%s<br>Осталось: %s мин %s сек. Получение в исходном ангаре.<br>%s' % (_pi_text(self.Place(j['locationID'])), seconds // 60, seconds % 60, u'Место недоступно. Автоматического Asset Safety нет.' if not j.get('locationExists') else u'')
 
@@ -256,7 +269,7 @@ try:
                     self.Status(u'Есть неподтверждённый запрос. Нажмите «Повторить запрос».')
                     return
                 try:
-                    payload = {'schematicID': self._recipe['schematicID'], 'batches': self.Batches(), 'requestID': str(_pi_uuid.uuid4())}
+                    payload = {'schematicID': self._recipe['schematicID'], 'batches': self.Batches(), 'requestID': str(_pi_uuid.uuid4()), 'mode': 'p1-chain'}
                     self.SavePending({'method': 'Start', 'payload': payload, 'character': self._character, 'location': self.Location()})
                     self.Retry()
                 except Exception as error:
@@ -289,7 +302,7 @@ try:
                         self.SavePending(None)
                     self.Status(u'Запрос обработан. Статус: %s' % job['status'])
                     self.Load()
-                elif result.get('code') in ('INVALID_REQUEST', 'INVALID_REQUEST_ID', 'INVALID_QUANTITY', 'RECIPE_NOT_FOUND', 'INSUFFICIENT_MATERIALS', 'INSUFFICIENT_MATERIALS_OR_QUANTITY_LIMIT', 'TOO_MANY_STACKS', 'JOB_NOT_FOUND', 'JOB_NOT_READY', 'DOCK_AT_JOB_LOCATION', 'LOCATION_UNAVAILABLE', 'LOCATION_ACCESS_DENIED'):
+                elif result.get('code') in ('RECIPE_CHANGED', 'INVALID_REQUEST', 'INVALID_REQUEST_ID', 'INVALID_QUANTITY', 'RECIPE_NOT_FOUND', 'INSUFFICIENT_MATERIALS', 'INSUFFICIENT_MATERIALS_OR_QUANTITY_LIMIT', 'TOO_MANY_STACKS', 'JOB_NOT_FOUND', 'JOB_NOT_READY', 'DOCK_AT_JOB_LOCATION', 'LOCATION_UNAVAILABLE', 'LOCATION_ACCESS_DENIED'):
                     self.SavePending(None)
                     self.Status(result.get('message', result.get('code')))
                 else:
@@ -395,9 +408,9 @@ try:
                     result = _pi_json.loads(sm.RemoteSvc('planetMgr').PiProcessingReady())
                     if not self.current() or generation != self.generation:
                         return
-                    if result.get('ok') and result.get('version') == '0.1.0':
+                    if result.get('ok') and result.get('version') == '0.1.1':
                         self.ready = True
-                        print('PI_PROCESSING:READY:0.1.0')
+                        print('PI_PROCESSING:READY:0.1.1')
                         return
                 except Exception:
                     pass
