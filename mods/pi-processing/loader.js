@@ -37,7 +37,7 @@ function install(root=path.resolve(__dirname,'../..')){
   }
   const state={active:true,getService,close(){if(closed)return;closed=true;clearInterval(timer);if(Module._load===load)Module._load=previousLoad;if(Module._extensions['.js']===extension)Module._extensions['.js']=previousExtension;for(const undo of restorers.reverse())undo();store.close();state.active=false;delete globalThis[MARK];}};
   globalThis[MARK]=state;Module._load=load;Module._extensions['.js']=extension;
-  process.once('exit',()=>{if(!closed)store.close();});console.log('[PIProcessing] 0.1.1 loaded; !piprocessing');return state;
+  process.once('exit',()=>{if(!closed)store.close();});console.log('[PIProcessing] 0.1.2 loaded; !piprocessing');return state;
 }
 module.exports={install,isWorldProcess};
 if(process.env.EVEJS_PI_PROCESSING_NO_AUTOINSTALL!=='1')install();

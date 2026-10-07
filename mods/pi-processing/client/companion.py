@@ -31,7 +31,7 @@ try:
 
         class PiProcessingWindow(Window):
             default_windowID = 'EveJSPIProcessing'
-            default_caption = u'Переработка PI 0.1.1'
+            default_caption = u'Переработка PI 0.1.2'
             default_width = 1050
             default_height = 760
             default_minSize = (950, 680)
@@ -248,6 +248,10 @@ try:
                     seconds = max(0, int((j['finishAtMs'] - self.Now()) / 1000))
                     self.details.text = u'%s<br>Осталось: %s мин %s сек. Получение в исходном ангаре.<br>%s' % (_pi_text(self.Place(j['locationID'])), seconds // 60, seconds % 60, u'Место недоступно. Автоматического Asset Safety нет.' if not j.get('locationExists') else u'')
 
+                else:
+                    self.Materials([])
+                    self.details.text = u'Выберите продукт.' if recipes else u'Выберите задание. Полученные партии скрыты.'
+
             def Pending(self):
                 try:
                     return getattr(_pi_builtins, 'settings').char.ui.Get('evejsPiProcessingPending', None)
@@ -408,9 +412,9 @@ try:
                     result = _pi_json.loads(sm.RemoteSvc('planetMgr').PiProcessingReady())
                     if not self.current() or generation != self.generation:
                         return
-                    if result.get('ok') and result.get('version') == '0.1.1':
+                    if result.get('ok') and result.get('version') == '0.1.2':
                         self.ready = True
-                        print('PI_PROCESSING:READY:0.1.1')
+                        print('PI_PROCESSING:READY:0.1.2')
                         return
                 except Exception:
                     pass

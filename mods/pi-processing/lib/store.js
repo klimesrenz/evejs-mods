@@ -13,6 +13,7 @@ function openStore(filename) {
     db.exec(`CREATE TABLE IF NOT EXISTS lease(id INTEGER PRIMARY KEY CHECK(id=1),pid INTEGER,host TEXT,token TEXT);
       CREATE TABLE IF NOT EXISTS jobs(id TEXT PRIMARY KEY,ownerID INTEGER NOT NULL,status TEXT NOT NULL,json TEXT NOT NULL);
       CREATE INDEX IF NOT EXISTS owner_jobs ON jobs(ownerID,id);
+      CREATE INDEX IF NOT EXISTS owner_visible_jobs ON jobs(ownerID,id) WHERE status != 'delivered';
       CREATE TABLE IF NOT EXISTS requests(ownerID INTEGER NOT NULL,id TEXT NOT NULL,json TEXT NOT NULL,PRIMARY KEY(ownerID,id));`);
     db.exec('BEGIN IMMEDIATE');
     const old=db.prepare('SELECT * FROM lease WHERE id=1').get();
@@ -27,7 +28,7 @@ function openStore(filename) {
     transaction(fn){check();if(inside)throw Error('NESTED_TRANSACTION');db.exec('BEGIN IMMEDIATE');inside=true;try{const r=fn();if(r?.then)throw Error('ASYNC_TRANSACTION');db.exec('COMMIT');return r;}catch(e){db.exec('ROLLBACK');throw e;}finally{inside=false;}},
     getJob(id){check();return parse(db.prepare('SELECT json FROM jobs WHERE id=?').get(id));},
     saveJob(j){write();db.prepare('INSERT INTO jobs VALUES(?,?,?,?) ON CONFLICT(id) DO UPDATE SET status=excluded.status,json=excluded.json').run(j.id,j.ownerID,j.status,JSON.stringify(j));},
-    listJobs(ownerID,cursor='',limit=50){check();return db.prepare('SELECT json FROM jobs WHERE ownerID=? AND id>? ORDER BY id LIMIT ?').all(ownerID,cursor,limit).map(parse);},
+    listJobs(ownerID,cursor='',limit=50){check();return db.prepare("SELECT json FROM jobs WHERE ownerID=? AND id>? AND status != 'delivered' ORDER BY id LIMIT ?").all(ownerID,cursor,limit).map(parse);},
     pending(){check();return db.prepare("SELECT json FROM jobs WHERE status IN ('starting','delivering') ORDER BY id").all().map(parse);},
     getRequest(ownerID,id){check();return parse(db.prepare('SELECT json FROM requests WHERE ownerID=? AND id=?').get(ownerID,id));},
     saveRequest(r){write();db.prepare('INSERT INTO requests VALUES(?,?,?) ON CONFLICT(ownerID,id) DO UPDATE SET json=excluded.json').run(r.ownerID,r.id,JSON.stringify(r));},

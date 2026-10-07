@@ -5,7 +5,7 @@ function installRpc(Service,getService){
   const char=s=>Number(s?.characterID||s?.charid)||0;
   function add(name,fn){if(Service.prototype[name])throw Error('RPC_ALREADY_REGISTERED');Service.prototype[name]=fn;handlers.set(name,fn);}
   function decode(args,fields){let raw=args?.[0];if(raw&&['wstring','token','rawstr'].includes(raw.type))raw=raw.value;if(Buffer.isBuffer(raw))raw=raw.toString('utf8');if(typeof raw!=='string'||Buffer.byteLength(raw)>4096)throw Error('INVALID_REQUEST');const req=JSON.parse(raw);if(!req||Array.isArray(req)||typeof req!=='object'||Object.keys(req).some(k=>!fields.includes(k)))throw Error('INVALID_REQUEST');return req;}
-  add('Handle_PiProcessingReady',function(args,s){if(char(s))ready.set(s,char(s));return JSON.stringify({ok:!!char(s),version:'0.1.1'});});
+  add('Handle_PiProcessingReady',function(args,s){if(char(s))ready.set(s,char(s));return JSON.stringify({ok:!!char(s),version:'0.1.2'});});
   for(const [name,method,fields] of [['Catalogue','catalogue',[]],['Quote','quote',['schematicID','batches']],['Start','start',['schematicID','batches','requestID','mode']],['Collect','collect',['jobID','requestID']],['Jobs','list',['cursor','limit']]]){
     add('Handle_PiProcessing'+name,function(args,s){try{
       if(!char(s)||ready.get(s)!==char(s))throw Error('CHARACTER_REQUIRED');

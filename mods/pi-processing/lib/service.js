@@ -63,7 +63,14 @@ function createService({store,authority,inventory,catalogue,clock=Date.now}) {
     },
     list(s,req={}){const ownerID=authority.identity(s),limit=req.limit??50,cursor=req.cursor??'';
       if(!Number.isInteger(limit)||limit<1||limit>50||typeof cursor!=='string'||cursor.length>80)throw Error('INVALID_PAGE');
-      const rows=store.listJobs(ownerID,cursor,limit);return {ok:true,jobs:rows.map(j=>view(s,settle(j))),nextCursor:rows.length===limit?rows.at(-1).id:null,serverNow:clock()};
+      const jobs=[];let scanCursor=cursor,more=false;
+      do {
+        const remaining=limit-jobs.length,rows=store.listJobs(ownerID,scanCursor,remaining);
+        more=rows.length===remaining;
+        if(rows.length)scanCursor=rows.at(-1).id;
+        for(const row of rows){const j=settle(row);if(j.status!=='delivered')jobs.push(view(s,j));}
+      } while(more&&jobs.length<limit);
+      return {ok:true,jobs,nextCursor:more?scanCursor:null,serverNow:clock()};
     },
     reconcile(){for(const j of store.pending())settle(j);}
   };

@@ -2,7 +2,7 @@
   "schemaVersion": 3,
   "id": "pi-processing",
   "displayName": "PI Processing",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Station and structure PI processing with persistent offline jobs.",
   "kind": "loader",
   "supportedBackends": [
