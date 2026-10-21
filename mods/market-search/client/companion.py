@@ -35,7 +35,7 @@ try:
 
         class MarketSearchWindow(Window):
             default_windowID = 'EveJSMarketSearch'
-            default_caption = 'Market Search 0.1.5'
+            default_caption = 'Market Search 0.1.6'
             default_width = 1100
             default_height = 620
             default_minSize = (850, 450)
@@ -281,9 +281,9 @@ try:
                     result = _ms_json.loads(sm.RemoteSvc('marketProxy').MarketSearchReady())
                     if not self.current() or generation != self.generation:
                         return
-                    if result.get('success') and result.get('version') == '0.1.5':
+                    if result.get('success') and result.get('version') == '0.1.6':
                         self.ready = True
-                        print('MARKET_SEARCH:READY:0.1.5')
+                        print('MARKET_SEARCH:READY:0.1.6')
                         return
                 except Exception:
                     pass

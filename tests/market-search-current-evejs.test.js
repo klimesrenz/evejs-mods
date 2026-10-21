@@ -23,22 +23,41 @@ const serverPackage = readJson(path.join(evejsRoot, "server/package.json"));
 
 assert.equal(evejsPackage.version, "261018.1");
 assert.equal(serverPackage.version, "261018.1");
-assert.equal(manifest.version, "0.1.5");
+assert.equal(manifest.version, "0.1.6");
 assert.equal(manifest.launcherApi.minLauncherVersion, "1.0.74");
 assert.ok(manifest.compatibility.evejsVersions.includes("261018.1"));
 
 for (const [relative, marker] of [
-  ["mods/market-search/loader.js", "0.1.5"],
-  ["mods/market-search/helper.js", "0.1.5"],
-  ["mods/market-search/client/companion.py", "0.1.5"],
-  ["mods/market-search/README.md", "Market Search 0.1.5"],
-  ["release-notes/market-search-0.1.5.md", "Market Search 0.1.5"],
+  ["mods/market-search/loader.js", "0.1.6"],
+  ["mods/market-search/helper.js", "0.1.6"],
+  ["mods/market-search/client/companion.py", "0.1.6"],
+  ["mods/market-search/README.md", "Market Search 0.1.6"],
+  ["release-notes/market-search-0.1.6.md", "Market Search 0.1.6"],
 ]) {
   assert.match(fs.readFileSync(path.join(repositoryRoot, relative), "utf8"), new RegExp(marker.replaceAll(".", "\\."), "u"), relative);
 }
 
 const reviewedHash = delivery.validateRoot(evejsRoot);
 assert.equal(reviewedHash, "c84cffe20c00cf075a97daa31ca53c435af4f14c814e46d828760dbbb55fb566");
+
+let state = 0x13579bdf;
+const denseBytes = Buffer.alloc(270000);
+for (let index = 0; index < denseBytes.length; index += 1) {
+  state ^= state << 13;
+  state ^= state >>> 17;
+  state ^= state << 5;
+  denseBytes[index] = state & 0xff;
+}
+const existingExpression = Buffer.from(`'${denseBytes.toString("base64")}'`, "ascii");
+const existingEnvelopeHeader = Buffer.alloc(5);
+existingEnvelopeHeader[0] = 0x74;
+existingEnvelopeHeader.writeUInt32LE(existingExpression.length, 1);
+const existingEnvelope = Buffer.concat([existingEnvelopeHeader, existingExpression]);
+assert.ok(existingEnvelope.length > 256 * 1024, "fixture must exceed the obsolete 256 KiB limit");
+const combinedEnvelope = delivery.createDelivery(modRoot)(existingEnvelope);
+assert.equal(combinedEnvelope[0], 0x74);
+assert.equal(combinedEnvelope.readUInt32LE(1), combinedEnvelope.length - 5);
+assert.ok(combinedEnvelope.length <= 512 * 1024, "combined login expression must stay within 512 KiB");
 
 const sourceContracts = [
   ["server/src/network/tcp/utils/marshal.js", /function encodePacket\(value\)/u],

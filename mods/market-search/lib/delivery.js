@@ -3,6 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const zlib = require("node:zlib");
 const crypto = require("node:crypto");
+const MAX_COMBINED_BYTES = 512 * 1024;
 // The reviewed original/native login envelope used by AutoMining too. Source
 // files are only read; no compiler hook and no client code.ccp patch is needed.
 const HANDSHAKE_HASHES = new Set([
@@ -37,7 +38,7 @@ function createDelivery(modRoot) {
       // globals AND locals. Preserve its result, exceptions and execution order.
       const packed = zlib.deflateSync(data, { level: 9 }).toString("base64");
       data = Buffer.from(`eval(compile(__import__('zlib').decompress(__import__('base64').b64decode('${packed}')), '<evejs-packed-login>', 'eval'), globals(), locals())`, "ascii");
-      if (data.length > 256 * 1024) throw Error(`Combined login payload is too large after compression (source=${sourceBytes}, packed=${data.length}, max=262144).`);
+      if (data.length > MAX_COMBINED_BYTES) throw Error(`Combined login payload is too large after compression (source=${sourceBytes}, packed=${data.length}, max=${MAX_COMBINED_BYTES}).`);
       console.log(`[MarketSearch] UI delivery packed: source=${sourceBytes} bytes, wire=${data.length} bytes`);
     }
     const header = Buffer.alloc(5); header[0] = 0x74; header.writeUInt32LE(data.length, 1);
