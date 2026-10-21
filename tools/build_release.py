@@ -9,28 +9,54 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = 'klimesrenz/evejs-mods'
 MODS = {
-    'pi-processing': ('PIProcessing-{version}.zip', 'pi-processing-v'),
-    'skyhook-pi': ('SkyhookPI-{version}.zip', 'skyhook-pi-v'),
-    'market-search': ('MarketSearch-{version}.zip', 'market-search-v'),
+    'pi-processing': ('PIProcessing-{version}.zip', 'pi-processing-v', 'pi-processing'),
+    'skyhook-pi': ('SkyhookPI-{version}.zip', 'skyhook-pi-v', 'skyhook-pi'),
+    'market-search': ('MarketSearch-{version}.zip', 'market-search-v', 'market-search'),
+    'solo-progression-balance': (
+        'EveJS-SoloProgressionBalance-{version}.zip',
+        'solo-progression-balance-v',
+        'soloprogressionbalance',
+    ),
 }
 
 
-def build(name, pattern, prefix):
+def validate_package_file(source, file):
+    relative = file.relative_to(source)
+    resolved_source = source.resolve(strict=True)
+    resolved_file = file.resolve(strict=True)
+    try:
+        resolved_relative = resolved_file.relative_to(resolved_source)
+    except ValueError as error:
+        raise ValueError('Package path escapes source root: ' + str(file)) from error
+    folded_parts = tuple(part.casefold() for part in relative.parts)
+    resolved_folded_parts = tuple(part.casefold() for part in resolved_relative.parts)
+    if file.is_symlink():
+        raise ValueError('Unexpected package file: ' + str(file))
+    if relative.name.casefold() == 'settings.json' or any(
+            part in {'_local', '__pycache__'} for part in folded_parts + resolved_folded_parts):
+        raise ValueError('Runtime/user package path: ' + str(file))
+    allowed_special = len(relative.parts) == 1 and file.name in {'LICENSE', '.env.example'}
+    if file.suffix not in {'.js', '.cjs', '.json', '.py', '.md'} and not allowed_special:
+        raise ValueError('Unexpected package file: ' + str(file))
+    allowed_env_example = relative.as_posix() == '.env.example' and resolved_relative.as_posix() == '.env.example'
+    if (any(part.startswith('.') for part in relative.parts) or
+            any(part.startswith('.') for part in resolved_relative.parts)) and not allowed_env_example:
+        raise ValueError('Hidden/runtime package path: ' + str(file))
+
+
+def build(name, pattern, prefix, package_id):
     source = ROOT / 'mods' / name
     manifest = json.loads((source / 'evejs-launcher.mod.json').read_text(encoding='utf-8'))
     expected = dict(provider='github', repository=REPOSITORY, asset=pattern,
                     channel='stable', tagPrefix=prefix, preserveFiles=[])
-    if manifest['id'] != name or manifest['schemaVersion'] != 3 or manifest['updates'] != expected:
+    if manifest['id'] != package_id or manifest['schemaVersion'] != 3 or manifest['updates'] != expected:
         raise ValueError('Unexpected package identity or update source: ' + name)
     version = manifest['version']
     if not re.fullmatch(r'(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)', version):
         raise ValueError('Use a stable semantic version: ' + name)
     files = sorted(p for p in source.rglob('*') if p.is_file() or p.is_symlink())
     for file in files:
-        if file.is_symlink() or file.suffix not in {'.js', '.cjs', '.json', '.py', '.md'}:
-            raise ValueError('Unexpected package file: ' + str(file))
-        if any(part.startswith('.') or part == '__pycache__' for part in file.relative_to(source).parts):
-            raise ValueError('Hidden/runtime package path: ' + str(file))
+        validate_package_file(source, file)
     output = ROOT / 'dist'
     output.mkdir(exist_ok=True)
     archive = output / pattern.replace('{version}', version)
@@ -46,7 +72,7 @@ def build(name, pattern, prefix):
         if package.testzip() is not None:
             raise ValueError('Invalid ZIP')
         data = json.loads(package.read('evejs-launcher.mod.json'))
-        if data['clientMenu']['entrypoint'] not in package.namelist():
+        if data.get('clientMenu') and data['clientMenu']['entrypoint'] not in package.namelist():
             raise ValueError('Missing client menu entrypoint')
     metadata = dict(schemaVersion=1, id=data['id'], version=data['version'], asset=archive.name)
     versions = data.get('compatibility', {}).get('evejsVersions')
@@ -66,8 +92,8 @@ def main():
     selected = [args.mod] if args.mod else list(MODS)
     outputs = []
     for name in selected:
-        pattern, prefix = MODS[name]
-        outputs.extend(build(name, pattern, prefix))
+        pattern, prefix, package_id = MODS[name]
+        outputs.extend(build(name, pattern, prefix, package_id))
     sums = ''.join(hashlib.sha256(file.read_bytes()).hexdigest() + '  ' + file.name + '\n'
                    for file in outputs)
     (ROOT / 'dist' / 'SHA256SUMS.txt').write_text(sums, encoding='ascii')

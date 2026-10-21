@@ -1,20 +1,21 @@
 # EveJS Mods
 
-Моды для нативного EveJS Launcher: **Skyhook PI**, **Market Search** и **PI Processing**.
-Минимальная версия Launcher — 1.0.69, Node.js — 24.
+Моды для нативного EveJS Launcher: **Skyhook PI**, **Market Search**, **PI Processing** и **SoloProgressionBalance**.
+Минимальная версия Launcher зависит от manifest конкретного мода: базовый минимум — 1.0.69, Market Search 0.1.6 требует 1.0.74. Node.js — 24.
 
 | Мод | Назначение | Инструкция |
 | --- | --- | --- |
 | PI Processing | Переработка P2–P4 в личном ангаре с офлайн-таймером | [README](mods/pi-processing/README.md) |
 | Skyhook PI | Автоматическое производство P1 через скайхуки, отдельный склад и ручной сбор кораблём | [README](mods/skyhook-pi/README.md) |
 | Market Search | Поиск NPC-продаж, расстояния и назначение маршрута | [README](mods/market-search/README.md) |
+| SoloProgressionBalance | Настраиваемое усиление одиночной добычи, mining drones, трюмов и logistics cargo | [README](mods/solo-progression-balance/README.md) |
 
 ## Установка
 
 1. В [Releases](https://github.com/klimesrenz/evejs-mods/releases) скачать ZIP нужного мода. GitHub Source code ZIP не является устанавливаемым модом.
 2. Остановить игровой сервер и закрыть EVE-клиент.
 3. Launcher → Mods → Add ZIP; при обновлении использовать существующую запись мода.
-4. Запустить сервер и клиент. Окна открываются из Neocom → Mods или командами `!skyhookpi` / `!marketfind`.
+4. Запустить сервер и клиент. Для модов с интерфейсом окна открываются из Neocom → Mods или командами `!skyhookpi` / `!marketfind`.
 
 Первые пакеты с каналом обновлений: Skyhook PI 0.1.7 и Market Search 0.1.3.
 Их нужно импортировать вручную. Следующие версии предлагаются через Check mod updates → Update. Проверка не устанавливает обновление автоматически.
@@ -23,7 +24,7 @@
 
 Версии EVE.js в manifest — предварительный фильтр. Helper дополнительно проверяет изученные исходники сервера; неизвестный build может быть отклонён даже при совпадении номера версии. Не обходите проверку.
 
-Базовая работа Skyhook PI 0.1.4 и Market Search 0.1.0 подтверждена пользователем на Windows. Пользователь подтвердил отображение меню после установки Skyhook PI 0.1.7 и Market Search 0.1.3. Публичное обнаружение и скачивание ZIP проверены кодом Launcher 1.0.69. Пользователь подтвердил обновление через Update до Skyhook PI 0.1.8 и Market Search 0.1.4. Пограничные игровые сценарии требуют отдельной приёмки.
+Базовая работа Skyhook PI 0.1.4 и Market Search 0.1.0 подтверждена пользователем на Windows. Пользователь подтвердил отображение меню после установки Skyhook PI 0.1.7 и Market Search 0.1.3. Публичное обнаружение и скачивание ZIP проверены кодом Launcher 1.0.69. Пользователь подтвердил обновление через Update до Skyhook PI 0.1.8 и Market Search 0.1.4. SoloProgressionBalance 0.5.0 автоматически проверен на EveJS 261018.1, но игровая приёмка ещё не выполнена. Пограничные игровые сценарии требуют отдельной приёмки.
 
 В репозитории только моды и упаковщик. Сервер EVE.js, клиент EVE, игровые базы, токены, конфиги и логи не включены. PI-склад хранится в установке EVE.js отдельно: `_local/mods/skyhook-pi/state.sqlite`. Обновление пакета не требует удаления склада.
 
@@ -39,7 +40,7 @@ python tools/build_release.py
 
 Перед новым выпуском согласованно изменить версию manifest, серверного readiness-ответа, клиента и сообщений загрузки, обновить README и release notes. Проверить пакет на копии установки.
 
-Каждый мод имеет независимые теги: `skyhook-pi-v0.1.7` и `market-search-v0.1.3` для первых выпусков. К соответствующему GitHub Release прикрепить ZIP и одноимённый `.update.json`; оба файла обязательны. Текст брать из `release-notes/`. Не менять стабильные id, источник обновлений и пути данных.
+Каждый мод имеет независимые теги: например, `skyhook-pi-v0.1.7`, `market-search-v0.1.3` и `solo-progression-balance-v0.5.0`. К соответствующему GitHub Release прикрепить ZIP и одноимённый `.update.json`; оба файла обязательны. Текст брать из `release-notes/`. Не менять стабильные id, источник обновлений и пути данных.
 
 Перед git push запрашивать подтверждение владельца репозитория. Публиковать только проверенные файлы из `dist/`; runtime-данные не публиковать.
 
@@ -58,3 +59,7 @@ python tools/build_release.py
 Для отдельной сборки PI Processing: `python tools/build_release.py --mod pi-processing`.
 Первый пакет 0.1.0 требует клиентской приёмки на Windows; локальные проверки
 не заменяют запуск в EVE. Задания хранятся в `_local/mods/pi-processing/state.sqlite`.
+
+Для отдельной сборки SoloProgressionBalance:
+`python tools/build_release.py --mod solo-progression-balance`.
+Пакет сохраняет исходный Launcher id `soloprogressionbalance`; происхождение и изменения описаны в `mods/solo-progression-balance/UPSTREAM.md`.

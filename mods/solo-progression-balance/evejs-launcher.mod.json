@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 3,
+  "id": "soloprogressionbalance",
+  "displayName": "SoloProgressionBalance",
+  "version": "0.5.0",
+  "description": "Solo mining, drone, hold and logistics scaling with optional automatic fitting simulation.",
+  "kind": "loader",
+  "supportedBackends": [
+    "native"
+  ],
+  "activation": {
+    "strategy": "loader_rename"
+  },
+  "restart": "game_server",
+  "compatibility": {
+    "evejsVersions": [
+      "261018.1"
+    ]
+  },
+  "settings": {
+    "schemaVersion": 1,
+    "files": [
+      {
+        "id": "preferences",
+        "base": "mod",
+        "path": "settings.json",
+        "format": "json"
+      }
+    ],
+    "fields": [
+      {
+        "id": "enabled",
+        "label": "Enable Solo scaling",
+        "type": "boolean",
+        "default": false,
+        "restart": "game_server",
+        "file": "preferences",
+        "key": [
+          "enabled"
+        ]
+      },
+      {
+        "id": "miningYieldScale",
+        "label": "Mining module yield multiplier",
+        "type": "number",
+        "default": 3,
+        "restart": "game_server",
+        "file": "preferences",
+        "key": [
+          "miningYieldScale"
+        ],
+        "minimum": 0.01,
+        "maximum": 100
+      },
+      {
+        "id": "miningDroneYieldScale",
+        "label": "Mining drone yield multiplier",
+        "type": "number",
+        "default": 3,
+        "restart": "game_server",
+        "file": "preferences",
+        "key": [
+          "miningDroneYieldScale"
+        ],
+        "minimum": 0.01,
+        "maximum": 100
+      },
+      {
+        "id": "miningHoldScale",
+        "label": "Mining hold multiplier",
+        "type": "number",
+        "default": 3,
+        "restart": "game_server",
+        "file": "preferences",
+        "key": [
+          "miningHoldScale"
+        ],
+        "minimum": 0.01,
+        "maximum": 100
+      },
+      {
+        "id": "logisticsCargoScale",
+        "label": "Logistics cargo multiplier",
+        "type": "number",
+        "default": 2,
+        "restart": "game_server",
+        "file": "preferences",
+        "key": [
+          "logisticsCargoScale"
+        ],
+        "minimum": 0.01,
+        "maximum": 100
+      },
+      {
+        "id": "verbose",
+        "label": "Verbose logging",
+        "type": "boolean",
+        "default": false,
+        "restart": "game_server",
+        "file": "preferences",
+        "key": [
+          "verbose"
+        ],
+        "advanced": true
+      }
+    ]
+  },
+  "updates": {
+    "provider": "github",
+    "repository": "klimesrenz/evejs-mods",
+    "asset": "EveJS-SoloProgressionBalance-{version}.zip",
+    "channel": "stable",
+    "tagPrefix": "solo-progression-balance-v",
+    "preserveFiles": []
+  },
+  "launcherApi": {
+    "version": 1,
+    "minLauncherVersion": "1.0.69",
+    "helper": {
+      "runtime": "node",
+      "path": "simulation/helper.js"
+    },
+    "capabilities": [
+      "install",
+      "verify",
+      "prepare_profile",
+      "prepare_disable",
+      "prepare_remove",
+      "recover"
+    ]
+  }
+}
