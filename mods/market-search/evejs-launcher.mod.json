@@ -2,7 +2,7 @@
   "schemaVersion": 3,
   "id": "market-search",
   "displayName": "Market Search",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "In-game item search across NPC station markets, stargate distances and destination selection.",
   "kind": "loader",
   "supportedBackends": [
@@ -18,12 +18,13 @@
       "0.12.7.1",
       "0.12.8",
       "0.12.9",
-      "0.12.19"
+      "0.12.19",
+      "261018.1"
     ]
   },
   "launcherApi": {
     "version": 1,
-    "minLauncherVersion": "1.0.69",
+    "minLauncherVersion": "1.0.74",
     "helper": {
       "runtime": "node",
       "path": "helper.js"
