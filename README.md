@@ -1,6 +1,6 @@
 # EveJS Mods
 
-Моды для нативного EveJS Launcher: **Skyhook PI**, **Market Search** и **PI Processing**.
+Моды для нативного EveJS Launcher: **Skyhook PI**, **Market Search**, **PI Processing** и **TQ Asteroid Belts**.
 Минимальная версия Launcher — 1.0.69, Node.js — 24.
 
 | Мод | Назначение | Инструкция |
@@ -8,6 +8,7 @@
 | PI Processing | Переработка P2–P4 в личном ангаре с офлайн-таймером | [README](mods/pi-processing/README.md) |
 | Skyhook PI | Автоматическое производство P1 через скайхуки, отдельный склад и ручной сбор кораблём | [README](mods/skyhook-pi/README.md) |
 | Market Search | Поиск NPC-продаж, расстояния и назначение маршрута | [README](mods/market-search/README.md) |
+| TQ Asteroid Belts | Точный TQ-состав и количество астероидов в стандартных поясах | [README](mods/tq-asteroid-belts/README.md) |
 
 ## Установка
 
@@ -39,7 +40,11 @@ python tools/build_release.py
 
 Перед новым выпуском согласованно изменить версию manifest, серверного readiness-ответа, клиента и сообщений загрузки, обновить README и release notes. Проверить пакет на копии установки.
 
-Каждый мод имеет независимые теги: `skyhook-pi-v0.1.7` и `market-search-v0.1.3` для первых выпусков. К соответствующему GitHub Release прикрепить ZIP и одноимённый `.update.json`; оба файла обязательны. Текст брать из `release-notes/`. Не менять стабильные id, источник обновлений и пути данных.
+Каждый мод имеет независимые теги: например, `skyhook-pi-v0.1.7` и `market-search-v0.1.3`. К соответствующему GitHub Release прикрепить ZIP и одноимённый `.update.json`; оба файла обязательны. Текст брать из `release-notes/`. Не менять стабильные id, источник обновлений и пути данных.
+
+Для отдельной сборки TQ Asteroid Belts:
+`python tools/build_release.py --mod tq-asteroid-belts`.
+Мод несовместим с FourModeAsteroidBelts и не изменяет SQLite.
 
 Перед git push запрашивать подтверждение владельца репозитория. Публиковать только проверенные файлы из `dist/`; runtime-данные не публиковать.
 

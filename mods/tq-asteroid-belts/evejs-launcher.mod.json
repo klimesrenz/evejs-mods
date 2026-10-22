@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 3,
+  "id": "tqasteroidbelts",
+  "displayName": "TQ Asteroid Belts",
+  "version": "0.1.0",
+  "description": "Creates standard asteroid belts from the TQ client per-belt type/count manifest.",
+  "kind": "loader",
+  "supportedBackends": [
+    "native"
+  ],
+  "activation": {
+    "strategy": "loader_rename"
+  },
+  "restart": "game_server",
+  "compatibility": {
+    "evejsVersions": [
+      "0.12.9",
+      "261018.1"
+    ]
+  },
+  "conflicts": [
+    "fourmodeasteroidbelts"
+  ],
+  "updates": {
+    "provider": "github",
+    "repository": "klimesrenz/evejs-mods",
+    "asset": "TQAsteroidBelts-{version}.zip",
+    "channel": "stable",
+    "tagPrefix": "tq-asteroid-belts-v",
+    "preserveFiles": []
+  }
+}
