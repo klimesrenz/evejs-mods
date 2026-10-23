@@ -1,14 +1,21 @@
 "use strict";
 const path=require('node:path');
+function resolveInstallerID(state,record,ownerCorpID){
+ const intent=state?.replacementsByPlanet?.[String(record?.planetID)];
+ const intentOwnerID=Number(intent?.context?.ownerID||intent?.context?.corporationID);
+ return Number(intent?.launchedItemID)===Number(record?.itemID)&&intentOwnerID>0&&intentOwnerID===Number(ownerCorpID)
+  ?Number(intent?.context?.characterID)||0:0;
+}
 function createAuthority(root){
  const get=p=>require(path.join(root,'server/src',p));
  const items=get('services/inventory/itemStore'),orbitals=get('services/planet/planetOrbitalState');
  const characters=get('services/character/characterState'),corps=get('services/corporation/corporationState'),roles=get('services/corporation/corporationRuntimeState');
  const holds=get('services/inventory/specialShipHoldRegistry'),fitting=get('_secondary/fitting/fittingRuntime');
- const live=get('services/fitting/liveFittingState'),space=get('space/runtime');
+ const live=get('services/fitting/liveFittingState'),space=get('space/runtime'),world=get('space/worldData');
+ const resolveSessionCharacterID=get('services/_shared/sessionIdentity').resolveSessionCharacterID;
  const maxDistance=get('services/ship/cargoContainerRuntime').MAX_CARGO_CONTAINER_TRANSFER_DISTANCE_METERS;
  function identity(s){
-  const characterID=Number(s?.characterID||s?.charid),c=characters.peekCharacterRecord(characterID);
+  const characterID=resolveSessionCharacterID(s),c=characters.peekCharacterRecord(characterID);
   const corpID=Number(c?.corporationID),corp=corps.getCorporationRecord(corpID);
   if(!c||c.deletedAt||c.isDeleted||!corp||corp.isNPC!==false)throw Error('PLAYER_CORPORATION_REQUIRED');
   return {characterID,corpID};
@@ -16,18 +23,21 @@ function createAuthority(root){
  function anchor(id){
   const item=items.findItemById(id),r=orbitals.getOrbitalByID(id,{refresh:false});
   if(!item||Number(item.typeID)!==81080||!r)return null;
-  const planet=orbitals._testing.findPlanetByID(Number(r.planetID));
+  const planet=world.getCelestialByID(Number(r.planetID));
   if(!planet||Number(item.locationID)!==Number(r.solarSystemID)||Number(item.flagID)!==0||Number(planet.solarSystemID)!==Number(r.solarSystemID))return null;
-  return {itemID:Number(id),planetID:Number(r.planetID),planetTypeID:Number(planet.typeID),planetName:planet.itemName,solarSystemID:Number(r.solarSystemID),ownerCorpID:Number(item.ownerID),installerID:Number(item.spaceState?.skyhookPiInstallerID)||0,active:[0,1].includes(Number(r.state))&&!r.destroyedAtMs,destroyed:!!r.destroyedAtMs};
+  const state=orbitals.readState();
+  return {itemID:Number(id),planetID:Number(r.planetID),planetTypeID:Number(planet.typeID),planetName:planet.itemName,solarSystemID:Number(r.solarSystemID),ownerCorpID:Number(item.ownerID),installerID:resolveInstallerID(state,r,item.ownerID),active:orbitals.isCustomsInventoryOrbitalRecord(r),destroyed:orbitals.isOrbitalRecordDestroyed(r)};
  }
  function manage(s,a){const who=identity(s);if(who.corpID!==a.ownerCorpID)return false;const corp=corps.getCorporationRecord(who.corpID);const role=roles.getCorporationSessionRoleState(who.corpID,who.characterID);return a.installerID===who.characterID||Number(corp.ceoID)===who.characterID||(BigInt(role.corprole||0)&1n)!==0n;}
  function collect(s,a,p,q,flagID){
   const who=identity(s),shipID=Number(s?._space?.shipID),ship=items.findItemById(shipID),systemID=Number(s?._space?.systemID);
   if(who.corpID!==a.ownerCorpID)throw Error('ACCESS_DENIED');
   if(!ship||Number(ship.ownerID)!==who.characterID||Number(ship.locationID)!==systemID||systemID!==a.solarSystemID)throw Error('SHIP_NOT_IN_SYSTEM');
-  const entity=space.getEntity(s,shipID),target=space.getEntity(s,a.itemID);
-  if(!entity||!target)throw Error('SKYHOOK_OUT_OF_RANGE');
-  const distance=Math.hypot(...['x','y','z'].map(k=>Number(entity.position[k])-Number(target.position[k])))-Number(entity.radius||0)-Number(target.radius||0);
+  const scene=space.getSceneForSession(s),entity=scene?.getEntityByID?.(shipID),target=scene?.getEntityByID?.(a.itemID);
+  if(!scene||Number(scene.systemID)!==systemID||!entity||!target)throw Error('SKYHOOK_OUT_OF_RANGE');
+  const distance=typeof scene.getCommandTimeEntitySurfaceDistance==='function'
+   ?scene.getCommandTimeEntitySurfaceDistance(entity,target)
+   :Math.hypot(...['x','y','z'].map(k=>Number(entity.position[k])-Number(target.position[k])))-Number(entity.radius||0)-Number(target.radius||0);
   if(!Number.isFinite(distance)||distance>maxDistance)throw Error('SKYHOOK_OUT_OF_RANGE');
   const metadata=items.getItemMetadata(p.typeID),volume=Number(metadata.volume);
   if(!(volume>0))throw Error('INVALID_PRODUCT_VOLUME');
@@ -50,4 +60,4 @@ function createAuthority(root){
   notify(s,r){for(const change of r?.data?.changes||[])characters.syncInventoryItemForSession(s,change.item||items.findItemById(change.itemID),change.previousState||change.previousData||{});}
  };
 }
-module.exports={createAuthority};
+module.exports={createAuthority,resolveInstallerID};

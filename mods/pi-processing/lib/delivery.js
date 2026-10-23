@@ -9,6 +9,7 @@ const HANDSHAKE_HASHES = new Set([
   "24a36b919dffb439d0030f25601655fa0402f196c6379064390870268e6b046f",
   "6305a9abe3e555ae845b0c9a27ed6d5bd08bba0e903eaf3789c3756b935fbbfd",
   "4fc3c37ec83c443c1497a3daba57d7157d05bbe55af3be2d5545b6162398ebc9",
+  "c84cffe20c00cf075a97daa31ca53c435af4f14c814e46d828760dbbb55fb566",
 ]);
 function validateRoot(root) {
   const source = fs.readFileSync(path.join(root, "server/src/network/tcp/handshake.js"), "utf8").replace(/\r\n/g, "\n");

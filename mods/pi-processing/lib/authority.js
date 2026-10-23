@@ -3,8 +3,9 @@ const path=require('node:path');
 function createAuthority(root){
   const get=p=>require(path.join(root,'server/src',p));
   const items=get('services/inventory/itemStore'),chars=get('services/character/characterState');
+  const resolveSessionCharacterID=get('services/_shared/sessionIdentity').resolveSessionCharacterID;
   const locations=get('services/structure/structureLocation'),structures=get('services/structure/structureState'),world=get('space/worldData');
-  function identity(s){const id=Number(s?.characterID||s?.charid),c=chars.peekCharacterRecord(id);if(!Number.isSafeInteger(id)||id<=0||!c||c.deletedAt||c.isDeleted)throw Error('CHARACTER_REQUIRED');return id;}
+  function identity(s){const id=resolveSessionCharacterID(s),c=chars.peekCharacterRecord(id);if(!id||!c||c.deletedAt||c.isDeleted)throw Error('CHARACTER_REQUIRED');return id;}
   function exists(id,kind){const row=kind==='structure'?structures.getStructureByID(id):world.getStationByID(id);return !!row&&!row.destroyedAtMs&&!row.destroyedAt;}
   function dock(s,expected){
     const ownerID=identity(s),locationID=locations.getDockedLocationID(s),locationKind=locations.getDockedLocationKind(s);

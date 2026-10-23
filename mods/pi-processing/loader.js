@@ -28,7 +28,7 @@ function install(root=path.resolve(__dirname,'../..')){
   }
   function load(request,parent,isMain){const exp=previousLoad.apply(this,arguments);if(!exp||!['function','object'].includes(typeof exp)||Module.isBuiltin(request))return exp;
     let kind;try{kind=targets.get(canonical(Module._resolveFilename(request,parent,isMain)));}catch{return exp;}if(!kind||seen.has(exp))return exp;
-    if(kind==='rpc'){rpc=installRpc(exp,getService);restorers.push(()=>rpc.restore());}
+    if(kind==='rpc'){const resolveSessionCharacterID=require(path.join(root,'server/src/services/_shared/sessionIdentity')).resolveSessionCharacterID;rpc=installRpc(exp,getService,resolveSessionCharacterID);restorers.push(()=>rpc.restore());}
     if(kind==='packet'){const original=exp.encodePacket;installPacketHook(exp,compose);const own=exp.encodePacket;restorers.push(()=>{if(exp.encodePacket===own)exp.encodePacket=original;});}
     if(kind==='chat'||kind==='plain')for(const [name,index]of(kind==='chat'?[['executeChatCommand',1]]:[['broadcastLocalMessage',1],['sendChannelMessage',2]])){
       const original=exp[name];if(typeof original!=='function')continue;
@@ -37,7 +37,7 @@ function install(root=path.resolve(__dirname,'../..')){
   }
   const state={active:true,getService,close(){if(closed)return;closed=true;clearInterval(timer);if(Module._load===load)Module._load=previousLoad;if(Module._extensions['.js']===extension)Module._extensions['.js']=previousExtension;for(const undo of restorers.reverse())undo();store.close();state.active=false;delete globalThis[MARK];}};
   globalThis[MARK]=state;Module._load=load;Module._extensions['.js']=extension;
-  process.once('exit',()=>{if(!closed)store.close();});console.log('[PIProcessing] 0.1.2 loaded; !piprocessing');return state;
+  process.once('exit',()=>{if(!closed)store.close();});console.log('[PIProcessing] 0.1.3 loaded; !piprocessing');return state;
 }
 module.exports={install,isWorldProcess};
 if(process.env.EVEJS_PI_PROCESSING_NO_AUTOINSTALL!=='1')install();
