@@ -70,7 +70,8 @@ def main():
         outputs.extend(build(name, pattern, prefix))
     sums = ''.join(hashlib.sha256(file.read_bytes()).hexdigest() + '  ' + file.name + '\n'
                    for file in outputs)
-    (ROOT / 'dist' / 'SHA256SUMS.txt').write_text(sums, encoding='ascii')
+    with (ROOT / 'dist' / 'SHA256SUMS.txt').open('w', encoding='ascii', newline='\n') as stream:
+        stream.write(sums)
     print(sums, end='')
 
 
