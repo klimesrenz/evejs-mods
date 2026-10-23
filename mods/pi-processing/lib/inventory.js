@@ -1,5 +1,10 @@
 'use strict';
 const path=require('node:path');
+function classifyReceipt(r){
+  if(!r?.success)return {state:'uncertain'};
+  if(!r.found)return {state:'absent'};
+  return r.durable?{state:'completed',receipt:r.data}:{state:'uncertain'};
+}
 function transformItems(input) {
   let source=input.replace(/\r\n/g,'\n');
   if(source.includes('/* pi-processing:items */'))throw Error('ALREADY_TRANSFORMED');
@@ -31,7 +36,7 @@ function createInventory(root) {
   if(typeof items.piProcessingConsume!=='function')throw Error('PRELOAD_REQUIRED');
   function normalize(r){return {ok:!!r?.success,durable:!!r?.durable,duplicate:!!r?.duplicate,changes:r?.data?.changes||[],code:r?.errorMsg};}
   return {
-    receipt(key){try{const r=items.getIdempotentGrantReceipt(key,{requireDurable:true});return !r.success||!r.durable?{state:'uncertain'}:r.found?{state:'completed',receipt:r.data}:{state:'absent'};}catch{return {state:'uncertain'};}},
+    receipt(key){try{return classifyReceipt(items.getIdempotentGrantReceipt(key,{requireDurable:true}));}catch{return {state:'uncertain'};}},
     consume(p){return normalize(items.piProcessingConsume(p.requests,{receiptKey:p.key,fingerprint:p.fingerprint,completedAtMs:p.startedAtMs}));},
     grant(p){return normalize(items.grantItemsToOwnerLocationIdempotent(p.ownerID,p.locationID,p.flagID,p.outputs.map(o=>({itemType:o.typeID,quantity:o.quantity})),{receiptKey:p.key}));},
     notify(s,r){for(const change of r?.changes||[]){const previous=change.previousState||change.previousData||{};
@@ -40,4 +45,4 @@ function createInventory(root) {
     }}
   };
 }
-module.exports={transformItems,createInventory};
+module.exports={transformItems,createInventory,classifyReceipt};
