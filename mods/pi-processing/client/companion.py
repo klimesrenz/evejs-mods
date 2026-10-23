@@ -31,7 +31,7 @@ try:
 
         class PiProcessingWindow(Window):
             default_windowID = 'EveJSPIProcessing'
-            default_caption = u'Переработка PI 0.1.3'
+            default_caption = u'Переработка PI 0.1.4'
             default_width = 1050
             default_height = 760
             default_minSize = (950, 680)
@@ -412,9 +412,9 @@ try:
                     result = _pi_json.loads(sm.RemoteSvc('planetMgr').PiProcessingReady())
                     if not self.current() or generation != self.generation:
                         return
-                    if result.get('ok') and result.get('version') == '0.1.3':
+                    if result.get('ok') and result.get('version') == '0.1.4':
                         self.ready = True
-                        print('PI_PROCESSING:READY:0.1.3')
+                        print('PI_PROCESSING:READY:0.1.4')
                         return
                 except Exception:
                     pass
