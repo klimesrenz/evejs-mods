@@ -9,7 +9,8 @@ function createService({store,authority,catalogue,clock=Date.now,settings={}}) {
    const r=authority.receipt(p.receiptKey);if(!r?.success)throw Error('RECOVERY_PENDING');
    store.transaction(()=>{
     const row=store.get(p.itemID);if(!row)throw Error('RESERVATION_OWNER_MISSING');
-    if(!r.found && row.status!=='destroyed'){const product=row.products.find(x=>x.typeID===p.typeID);if(!product)throw Error('RESERVATION_PRODUCT_MISSING');product.quantity+=p.quantity;store.save(row);}
+    const reserved=p.products||[{typeID:p.typeID,quantity:p.quantity}];
+    if(!r.found && row.status!=='destroyed'){for(const entry of reserved){const product=row.products.find(x=>x.typeID===entry.typeID);if(!product)throw Error('RESERVATION_PRODUCT_MISSING');product.quantity+=entry.quantity;}store.save(row);}
     const result={ok:!!r.found,code:r.found?'COLLECTED':'GRANT_NOT_COMMITTED',quantity:r.found?p.quantity:0,requestID:p.requestID};
     store.remember(p.ownerID,p.requestID,p.payload,result);store.finish(p.receiptKey);
    });
@@ -53,17 +54,18 @@ function createService({store,authority,catalogue,clock=Date.now,settings={}}) {
   store.transaction(()=>{store.save(row);store.remember(who.characterID,requestID,payload,result);});return result;
  });}
  function collect(session,request){return lane(()=>{
-  const {itemID,typeID,quantity,flagID,requestID}=request;
-  positive(typeID,'TYPE_ID');positive(quantity,'QUANTITY');positive(flagID,'FLAG');
+  const {itemID,flagID,requestID}=request;
+  positive(flagID,'FLAG');
   const {who,a}=check(session,itemID);recover(itemID);
-  const payload=JSON.stringify({action:'collect',itemID,typeID,quantity,flagID});const prev=key(who,requestID,payload);if(prev)return prev;
+  const payload=JSON.stringify({action:'collect',itemID,flagID});const prev=key(who,requestID,payload);if(prev)return prev;
   const row=syncRow(itemID);if(!row||row.status==='destroyed')throw Error('NOT_CONFIGURED');
-  const product=row.products.find(p=>p.typeID===typeID);if(!product||product.quantity<=0)throw Error('EMPTY_STOCK');
-  const destination=authority.collect(session,a,product,Math.min(quantity,product.quantity),flagID);
+  const stocked=row.products.filter(product=>product.quantity>0);if(!stocked.length)throw Error('EMPTY_STOCK');
+  const destination=authority.collect(session,a,stocked,flagID);
   positive(destination.quantity,'QUANTITY');
-  if(destination.quantity>Math.min(quantity,product.quantity))throw Error('INVALID_RESERVATION');
-  const p={...destination,itemID,typeID,requestID,payload,receiptKey:'skyhook-pi:'+crypto.randomUUID()};
-  product.quantity-=p.quantity;
+  if(!Array.isArray(destination.products)||!destination.products.length)throw Error('INVALID_RESERVATION');
+  for(const entry of destination.products){const product=row.products.find(p=>p.typeID===entry.typeID);positive(entry.typeID,'TYPE_ID');positive(entry.quantity,'QUANTITY');if(!product||entry.quantity>product.quantity)throw Error('INVALID_RESERVATION');product.quantity-=entry.quantity;}
+  if(destination.quantity!==destination.products.reduce((sum,p)=>sum+p.quantity,0))throw Error('INVALID_RESERVATION');
+  const p={...destination,itemID,requestID,payload,receiptKey:'skyhook-pi:'+crypto.randomUUID()};
   store.transaction(()=>{store.save(row);store.reserve(p);store.remember(who.characterID,requestID,payload,{ok:false,code:'RECOVERY_PENDING',requestID});});
   const granted=authority.grant(p);recover(itemID);
   const result=store.request(who.characterID,requestID).result;

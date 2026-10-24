@@ -22,7 +22,7 @@ try:
         from carbonui.control.window import Window
         from carbonui.control.button import Button
         from carbonui.control.combo import Combo
-        from carbonui.control.singlelineedits.singleLineEditText import SingleLineEditText
+
         from carbonui.primitives.container import Container
         from eve.client.script.ui.control.eveLabel import EveLabelMedium
         from eve.client.script.ui.control.eveScroll import Scroll
@@ -31,7 +31,7 @@ try:
 
         class SkyhookPiWindow(Window):
             default_windowID = 'EveJSSkyhookPI'
-            default_caption = 'Skyhook PI 0.1.13'
+            default_caption = 'Skyhook PI 0.1.14'
             default_width = 1100
             default_height = 570
             default_minSize = (1000, 500)
@@ -65,7 +65,6 @@ try:
                 bottom = Container(parent=self.content, align=C.TOBOTTOM, height=86)
                 self.hold = Combo(parent=bottom, align=C.TOPLEFT, width=220,
                     options=[(u'Обычный трюм', 5), (u'Планетарный трюм', 149), (u'Инфраструктурный трюм', 185)], select=5)
-                self.quantity = SingleLineEditText(parent=bottom, align=C.TOPLEFT, left=230, width=120, setvalue='40320')
                 self.collectButton = Button(parent=bottom, align=C.TOPRIGHT, width=180, label=u'Забрать', func=self.Collect)
                 self.collectHint = EveLabelMedium(parent=bottom, align=C.TOBOTTOM, height=48, maxLines=3, text=u'')
                 body = Container(parent=self.content, align=C.TOALL)
@@ -218,13 +217,13 @@ try:
                 else:
                     self.collectButton.SetLabel(u'Забрать')
                     near, hint = self.RangeState()
-                    product = self._selected[1] if self._selected else None
-                    if near and product is None:
-                        hint = u'Выберите P1 справа, укажите количество и трюм.'
-                    elif near and product['quantity'] <= 0:
-                        hint = u'Выбранный продукт пока не накоплен. Обновите список после цикла.'
+                    stocked = row is not None and any(product['quantity'] > 0 for product in row['products'])
+                    if near and not stocked:
+                        hint = u'На этом скайхуке пока нет накопленных продуктов.'
+                    elif near:
+                        hint = u'Будут забраны все продукты, которые помещаются в выбранный трюм.'
                     self.collectHint.text = _pi_text(hint)
-                    enabled = near and product is not None and product['quantity'] > 0 and not self._busy
+                    enabled = near and stocked and not self._busy
                 self.collectButton.Enable() if enabled else self.collectButton.Disable()
 
             def WatchRange(self):
@@ -271,7 +270,7 @@ try:
                     finally:
                         self._rendering = False
                     self.RenderHooks()
-                    self.Status(u'Скайхуков: %s. Выберите структуру слева, продукт справа.' % len(self._rows))
+                    self.Status(u'Скайхуков: %s. Выберите структуру слева и трюм для сбора.' % len(self._rows))
                 except Exception as error:
                     if self.Valid():
                         self.Status(unicode(error))
@@ -302,22 +301,11 @@ try:
                         return
                     request = {'action': action, 'itemID': row['itemID'], 'requestID': _pi_uuid.uuid4().hex}
                     if action == 'collect':
-                        if self._selected is None:
-                            self.Status(u'Выберите P1 справа.')
-                            return
                         near, hint = self.RangeState()
                         if not near:
                             self.Status(hint)
                             return
-                        product = self._selected[1]
-                        try:
-                            quantity = int(self.quantity.GetValue())
-                            if quantity <= 0:
-                                raise ValueError('quantity')
-                        except Exception:
-                            self.Status(u'Введите положительное целое количество.')
-                            return
-                        request.update(typeID=product['typeID'], quantity=quantity, flagID=self.hold.GetValue())
+                        request.update(flagID=self.hold.GetValue())
                     self._pending = request
                 self._busy = True
                 self.UpdateControls()
@@ -430,9 +418,9 @@ try:
                     result = _pi_json.loads(sm.RemoteSvc('planetMgr').SkyhookPiReady())
                     if not self.current() or generation != self.generation:
                         return
-                    if result.get('ok') and result.get('version') == '0.1.13':
+                    if result.get('ok') and result.get('version') == '0.1.14':
                         self.ready = True
-                        print('SKYHOOK_PI:READY:0.1.13')
+                        print('SKYHOOK_PI:READY:0.1.14')
                         return
                 except Exception:
                     pass

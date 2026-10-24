@@ -6,6 +6,18 @@ function resolveInstallerID(state,record,ownerCorpID){
  return Number(intent?.launchedItemID)===Number(record?.itemID)&&intentOwnerID>0&&intentOwnerID===Number(ownerCorpID)
   ?Number(intent?.context?.characterID)||0:0;
 }
+function planCollection(products,volumeForType,availableVolume){
+ if(!Number.isFinite(availableVolume)||availableVolume<0)throw Error('CARGO_VOLUME_UNKNOWN');
+ let remaining=availableVolume;const result=[];
+ for(const product of products){
+  const typeID=Number(product?.typeID),stock=Number(product?.quantity),volume=Number(volumeForType(typeID));
+  if(!Number.isSafeInteger(typeID)||typeID<=0||!Number.isSafeInteger(stock)||stock<0)throw Error('INVALID_STOCK');
+  if(!(volume>0))throw Error('INVALID_PRODUCT_VOLUME');
+  const quantity=Math.min(stock,Math.floor(remaining/volume+1e-9));
+  if(quantity>0){result.push({typeID,quantity});remaining=Math.max(0,remaining-quantity*volume);}
+ }
+ return result;
+}
 function createAuthority(root){
  const get=p=>require(path.join(root,'server/src',p));
  const items=get('services/inventory/itemStore'),orbitals=get('services/planet/planetOrbitalState');
@@ -29,7 +41,7 @@ function createAuthority(root){
   return {itemID:Number(id),planetID:Number(r.planetID),planetTypeID:Number(planet.typeID),planetName:planet.itemName,solarSystemID:Number(r.solarSystemID),ownerCorpID:Number(item.ownerID),installerID:resolveInstallerID(state,r,item.ownerID),active:orbitals.isCustomsInventoryOrbitalRecord(r),destroyed:orbitals.isOrbitalRecordDestroyed(r)};
  }
  function manage(s,a){const who=identity(s);if(who.corpID!==a.ownerCorpID)return false;const corp=corps.getCorporationRecord(who.corpID);const role=roles.getCorporationSessionRoleState(who.corpID,who.characterID);return a.installerID===who.characterID||Number(corp.ceoID)===who.characterID||(BigInt(role.corprole||0)&1n)!==0n;}
- function collect(s,a,p,q,flagID){
+ function collect(s,a,products,flagID){
   const who=identity(s),shipID=Number(s?._space?.shipID),ship=items.findItemById(shipID),systemID=Number(s?._space?.systemID);
   if(who.corpID!==a.ownerCorpID)throw Error('ACCESS_DENIED');
   if(!ship||Number(ship.ownerID)!==who.characterID||Number(ship.locationID)!==systemID||systemID!==a.solarSystemID)throw Error('SHIP_NOT_IN_SYSTEM');
@@ -39,25 +51,27 @@ function createAuthority(root){
    ?scene.getCommandTimeEntitySurfaceDistance(entity,target)
    :Math.hypot(...['x','y','z'].map(k=>Number(entity.position[k])-Number(target.position[k])))-Number(entity.radius||0)-Number(target.radius||0);
   if(!Number.isFinite(distance)||distance>maxDistance)throw Error('SKYHOOK_OUT_OF_RANGE');
-  const metadata=items.getItemMetadata(p.typeID),volume=Number(metadata.volume);
-  if(!(volume>0))throw Error('INVALID_PRODUCT_VOLUME');
   const snapshot=fitting.getShipFittingSnapshot(who.characterID,shipID,{shipItem:ship,reason:'skyhook-pi.collect'});
   const resources=snapshot?.resourceState||{};
-  if(flagID!==items.ITEM_FLAGS.CARGO_HOLD && (!holds.isSpecialShipHoldFlag(flagID)||!holds.isSpecialShipHoldItemAllowed(metadata,flagID)))throw Error('INVALID_HOLD');
+  const stocked=products.filter(p=>p.quantity>0),metadataByType=new Map();
+  if(!stocked.length)throw Error('EMPTY_STOCK');
+  for(const product of stocked){const metadata=items.getItemMetadata(product.typeID);metadataByType.set(product.typeID,metadata);
+   if(flagID!==items.ITEM_FLAGS.CARGO_HOLD && (!holds.isSpecialShipHoldFlag(flagID)||!holds.isSpecialShipHoldItemAllowed(metadata,flagID)))throw Error('INVALID_HOLD');}
   const capacity=flagID===items.ITEM_FLAGS.CARGO_HOLD?Number(resources.cargoCapacity||0):holds.getSpecialShipHoldCapacity(resources,ship.typeID,flagID,live.getShipBaseAttributeValue);
   let used=0;
   for(const i of items.listContainerItems(who.characterID,shipID,flagID)){
    const v=Number(i.volume??items.getItemMetadata(i.typeID).volume),n=Number(i.stacksize??i.quantity??1);
    if(!Number.isFinite(v)||v<0||!Number.isFinite(n)||n<0)throw Error('CARGO_VOLUME_UNKNOWN');used+=v*Math.max(1,n);
   }
-  const quantity=Math.min(q,Math.floor(Math.max(0,capacity-used)/volume));if(!Number.isSafeInteger(quantity)||quantity<=0)throw Error('CARGO_FULL');
-  return {ownerID:who.characterID,shipID,flagID,quantity};
+  const planned=planCollection(stocked,typeID=>metadataByType.get(typeID)?.volume,Math.max(0,capacity-used));
+  if(!planned.length)throw Error('CARGO_FULL');
+  return {ownerID:who.characterID,shipID,flagID,products:planned,quantity:planned.reduce((sum,p)=>sum+p.quantity,0)};
  }
  return {identity,anchor,manage,collect,collectRangeMeters:maxDistance,
   list(s){const who=identity(s);return Object.values(orbitals.readState().orbitalsByID||{}).filter(r=>Number(r.typeID)===81080).map(r=>anchor(Number(r.itemID))).filter(a=>a&&a.ownerCorpID===who.corpID);},
   receipt:key=>items.getIdempotentGrantReceipt(key,{requireDurable:true}),
-  grant:p=>items.grantItemToOwnerLocationIdempotent(p.ownerID,p.shipID,p.flagID,p.typeID,p.quantity,{receiptKey:p.receiptKey}),
+  grant:p=>items.grantItemsToOwnerLocationIdempotent(p.ownerID,p.shipID,p.flagID,p.products.map(product=>({itemType:product.typeID,quantity:product.quantity})),{receiptKey:p.receiptKey}),
   notify(s,r){for(const change of r?.data?.changes||[])characters.syncInventoryItemForSession(s,change.item||items.findItemById(change.itemID),change.previousState||change.previousData||{});}
  };
 }
-module.exports={createAuthority,resolveInstallerID};
+module.exports={createAuthority,resolveInstallerID,planCollection};
