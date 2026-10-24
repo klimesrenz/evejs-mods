@@ -8,7 +8,7 @@ function installRpc(Service,getService){
  }
  const previous=new Map();
  function add(name,fn){if(Service.prototype[name])throw Error('RPC_ALREADY_REGISTERED');previous.set(name,fn);Service.prototype[name]=fn;}
- add('Handle_SkyhookPiReady',function(args,s){if(character(s))ready.set(s,character(s));return JSON.stringify({ok:!!character(s),version:'0.1.13'});});
+ add('Handle_SkyhookPiReady',function(args,s){if(character(s))ready.set(s,character(s));return JSON.stringify({ok:!!character(s),version:'0.1.14'});});
  add('Handle_SkyhookPiList',function(args,s){return run(s,()=>getService().list(s));});
  add('Handle_SkyhookPiAction',function(args,s){return run(s,()=>{
   let raw=Array.isArray(args)?args[0]:null;
@@ -16,7 +16,7 @@ function installRpc(Service,getService){
   if(Buffer.isBuffer(raw)){if(raw.length>4096)throw Error('INVALID_REQUEST');raw=raw.toString('utf8');}
   if(typeof raw!=='string'||Buffer.byteLength(raw,'utf8')>4096)throw Error('INVALID_REQUEST');
   const req=JSON.parse(raw);if(!req||!['start','pause','collect'].includes(req.action))throw Error('INVALID_ACTION');
-  for(const key of Object.keys(req))if(!['action','itemID','typeID','quantity','flagID','requestID'].includes(key))throw Error('INVALID_FIELD');
+  for(const key of Object.keys(req))if(!['action','itemID','flagID','requestID'].includes(key))throw Error('INVALID_FIELD');
   const svc=getService();return req.action==='collect'?svc.collect(s,req):svc[req.action](s,req.itemID,req.requestID);
  });});
  return {open(s){if(!character(s)||ready.get(s)!==character(s))return 'Skyhook PI UI not ready; restart client.';s.sendNotification('OnSkyhookPiOpen','clientID',[]);return 'Skyhook PI opened.';},restore(){for(const [name,fn]of previous)if(Service.prototype[name]===fn)delete Service.prototype[name];}};
