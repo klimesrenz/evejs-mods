@@ -8,6 +8,7 @@ const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 
 const repositoryRoot = path.resolve(__dirname, "..");
+const python = process.env.PYTHON || (process.platform === "win32" ? "python" : "python3");
 
 for (const candidate of [
   { id: "pi-processing", archive: "PIProcessing-0.1.7.zip", root: "PIProcessing-0.1.7/" },
@@ -21,7 +22,7 @@ for (const candidate of [
     fs.copyFileSync(path.join(repositoryRoot, "tools/build_release.py"), path.join(fixture, "tools/build_release.py"));
     fs.cpSync(path.join(repositoryRoot, "mods", candidate.id), path.join(fixture, "mods", candidate.id), { recursive: true });
 
-    const built = spawnSync("python", ["tools/build_release.py", "--mod", candidate.id], {
+    const built = spawnSync(python, ["tools/build_release.py", "--mod", candidate.id], {
       cwd: fixture,
       encoding: "utf8",
     });
