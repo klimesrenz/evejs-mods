@@ -23,26 +23,26 @@ function readJson(relative, root = repositoryRoot) {
   return JSON.parse(read(relative, root));
 }
 
-test("Skyhook PI 0.1.14 consistently targets EveJS 261018.1", () => {
-  assert.equal(readJson("package.json", evejsRoot).version, "261018.1");
-  assert.equal(readJson("server/package.json", evejsRoot).version, "261018.1");
+test("Skyhook PI 0.1.17 consistently targets EveJS 261108.1", () => {
+  assert.equal(readJson("package.json", evejsRoot).version, "261108.1");
+  assert.equal(readJson("server/package.json", evejsRoot).version, "261108.1");
   const manifest = readJson("mods/skyhook-pi/evejs-launcher.mod.json");
-  assert.equal(manifest.version, "0.1.14");
-  assert.deepEqual(manifest.compatibility.evejsVersions, ["261018.1"]);
+  assert.equal(manifest.version, "0.1.17");
+  assert.deepEqual(manifest.compatibility.evejsVersions, ["261108.1"]);
   assert.equal(manifest.launcherApi.minLauncherVersion, "1.0.74");
   for (const [relative, marker] of [
-    ["mods/skyhook-pi/loader.js", "0.1.14 loaded"],
-    ["mods/skyhook-pi/lib/rpc.js", "version:'0.1.14'"],
-    ["mods/skyhook-pi/client/companion.py", "Skyhook PI 0.1.14"],
-    ["mods/skyhook-pi/README.md", "Skyhook PI 0.1.14"],
-    ["release-notes/skyhook-pi-0.1.14.md", "Skyhook PI 0.1.14"],
+    ["mods/skyhook-pi/loader.js", "0.1.17 loaded"],
+    ["mods/skyhook-pi/lib/rpc.js", "version:'0.1.17'"],
+    ["mods/skyhook-pi/client/companion.py", "Skyhook PI 0.1.17"],
+    ["mods/skyhook-pi/README.md", "Skyhook PI 0.1.17"],
+    ["release-notes/skyhook-pi-0.1.17.md", "Skyhook PI 0.1.17"],
   ]) assert.match(read(relative), new RegExp(marker.replaceAll(".", "\\."), "u"), relative);
 });
 
 test("Skyhook PI compatibility guard accepts the reviewed current Core", () => {
   const result = compatibility.inspectRoot(evejsRoot);
   assert.equal(result.compatible, true, result.errors.join("; "));
-  assert.equal(result.version, "261018.1");
+  assert.equal(result.version, "261108.1");
 });
 
 test("Skyhook PI current transforms apply and compile", () => {

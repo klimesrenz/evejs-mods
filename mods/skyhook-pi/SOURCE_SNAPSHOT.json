@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "mod": {
+    "id": "skyhook-pi",
+    "version": "0.1.17"
+  },
+  "core": {
+    "version": "261108.1",
+    "commit": "e7b2f092eff3cf6ecd7838ee899b08c438707eff"
+  },
+  "files": [
+    {
+      "path": "PROVENANCE.md",
+      "size": 2822,
+      "sha256": "2a6f2430b73d28ec1d3b1cd504ede118be2169ea738548b3f8f7eaaff7fa2ed2"
+    },
+    {
+      "path": "README.md",
+      "size": 30391,
+      "sha256": "b125f475f102f2664b1c945713652d7f72dbc1737a7ef99933813d31ffad92cd"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "size": 1438,
+      "sha256": "5daa6fde38f3bc0583ec77168ae7925de65ad10bacbe227e5467cf95b719d278"
+    },
+    {
+      "path": "client/companion.py",
+      "size": 23976,
+      "sha256": "a1a0cb519501adb845d27b59f11ecf40607b40ff7c1b21d487d503fcd2197133"
+    },
+    {
+      "path": "client/menu.py",
+      "size": 865,
+      "sha256": "8a8b7a8a8c3d771d2d76e0d193f5230451758c22b16fc3d51f61edc007464ef9"
+    },
+    {
+      "path": "evejs-launcher.mod.json",
+      "size": 1001,
+      "sha256": "b8ac686f1f0c15ce4685dc6f6235f60fc11a156dffb7face8fdbe581e4d1b077"
+    },
+    {
+      "path": "helper.js",
+      "size": 2251,
+      "sha256": "b6e12e2f49dce5e091893869aa93a90a7111b0d2f33d42859c99b2f4f0ea1066"
+    },
+    {
+      "path": "inspect.cjs",
+      "size": 290,
+      "sha256": "2390ca557d423e06186fb5a5b2e3ccb87b5c4d173905c71813a5a7c9bf4db2d7"
+    },
+    {
+      "path": "lib/authority.js",
+      "size": 6498,
+      "sha256": "37e0b864de56477f975a2eae0cee6d882b16fbe4e78ad8777c985be27b23cd8c"
+    },
+    {
+      "path": "lib/catalogue.js",
+      "size": 906,
+      "sha256": "ec6a34cb2026c443e6addac88896d249aaba7f80f74e131f8f29c1c246c2e9c3"
+    },
+    {
+      "path": "lib/compatibility.js",
+      "size": 3814,
+      "sha256": "34f9eebab78117c2190c0d6dec847a8a3c91834dda33481cca16ef6467b4358c"
+    },
+    {
+      "path": "lib/delivery.js",
+      "size": 4229,
+      "sha256": "089233dcfafd3f9ca94e54c5b37bd984c166d969823a9ae2137a4fc9a74ed22e"
+    },
+    {
+      "path": "lib/fault.js",
+      "size": 1511,
+      "sha256": "972e10a11d851d284e13006bfa93a6379a8b3d3e000b30bcb0bfdca59c654630"
+    },
+    {
+      "path": "lib/lifecycle.js",
+      "size": 2935,
+      "sha256": "8c3472319fd63ea4ae55a112bd5dadce37ccf461e2dcbbeddbdd8b0f838ed14d"
+    },
+    {
+      "path": "lib/moduleHookRegistry.js",
+      "size": 3191,
+      "sha256": "1733e373ba37d4dedbed283233ff9484ce01df009586e733b23697973ca62a6e"
+    },
+    {
+      "path": "lib/moduleTargetCache.js",
+      "size": 432,
+      "sha256": "771bc92052d3cd3ad03cd3367fd2ff1125ee3e2f118223535236412e1b592d4d"
+    },
+    {
+      "path": "lib/orbitals.js",
+      "size": 2150,
+      "sha256": "713c4cee92cde70b9adcb2f94b2f94fa89901a4308ee9759d76edf6a6fd422b0"
+    },
+    {
+      "path": "lib/production.js",
+      "size": 1315,
+      "sha256": "f4ef918fefae88b8bd0ce5f680ed62d5506c78f586b0c6245956861088f8f4e5"
+    },
+    {
+      "path": "lib/reviewed.json",
+      "size": 2719,
+      "sha256": "e7adcf1cdbe6b04b3e3d8a7af763413a6219d54db0de54b0aad18c4f7ec6ae2c"
+    },
+    {
+      "path": "lib/rpc.js",
+      "size": 2007,
+      "sha256": "a327b523bb346ee891c3eb1acccd0dae93e106ecf5f1f56091b0cce6e5decb28"
+    },
+    {
+      "path": "lib/service.js",
+      "size": 6098,
+      "sha256": "f5a7fbd5298f593074f2c00d98a26c319a77fab224a0c40469be504a41e22390"
+    },
+    {
+      "path": "lib/store.js",
+      "size": 4479,
+      "sha256": "843ca886dfc660aef189431b3f7fa0f015aabbe3cd5d1a80b91d5f6efb330c6c"
+    },
+    {
+      "path": "loader.js",
+      "size": 7188,
+      "sha256": "4cd99eb84efbda7c93e444c197b16061fc422f951670899eda1a96f3088b4721"
+    }
+  ]
+}

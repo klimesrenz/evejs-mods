@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "mod": {
+    "id": "pi-processing",
+    "version": "0.1.7"
+  },
+  "core": {
+    "version": "261108.1",
+    "commit": "e7b2f092eff3cf6ecd7838ee899b08c438707eff"
+  },
+  "files": [
+    {
+      "path": "PROVENANCE.md",
+      "size": 2414,
+      "sha256": "1d5e95f4cd01ddd881fe5721c2981475c7be6fc1a5f2e0d349f37f296e16f00c"
+    },
+    {
+      "path": "README.md",
+      "size": 12733,
+      "sha256": "5ee8ef9ef2d5db793eca735d0ff2194ae467a416c8a8f74b913cf9b3f8d48135"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "size": 1438,
+      "sha256": "5daa6fde38f3bc0583ec77168ae7925de65ad10bacbe227e5467cf95b719d278"
+    },
+    {
+      "path": "client/companion.py",
+      "size": 23570,
+      "sha256": "dc2c6cf156ccb263ce1728c24571e5e1fc7ad7b990a2877286673f7f270c7da0"
+    },
+    {
+      "path": "client/menu.py",
+      "size": 892,
+      "sha256": "65c2fc593a066de5ff60ad6201164da0a05338c1814e17d2124780bf0994a68b"
+    },
+    {
+      "path": "evejs-launcher.mod.json",
+      "size": 1009,
+      "sha256": "ab95a9a631b653e5a532b1c02e38905130f6f7dcfc578c475423b0fa22189213"
+    },
+    {
+      "path": "helper.js",
+      "size": 1649,
+      "sha256": "3ba5310eed27335c4271017796778b840a00d254aaffb76dce70278f6a9a3909"
+    },
+    {
+      "path": "lib/authority.js",
+      "size": 2545,
+      "sha256": "cc2e1ea25d4b7a3a94f53b67868e586d5e60dcca5743cdd15f026aa45d4cf6fa"
+    },
+    {
+      "path": "lib/catalogue.js",
+      "size": 2039,
+      "sha256": "95d51c76ea6b358e0639c43d8ec7b967bca58fccc3f810226b37d9b7422b0fd3"
+    },
+    {
+      "path": "lib/chain.js",
+      "size": 2398,
+      "sha256": "f1a538b166aba46b4f0a858676ddba063f9561ef35652e20ded5a2881ecfef3d"
+    },
+    {
+      "path": "lib/compatibility.js",
+      "size": 3814,
+      "sha256": "34f9eebab78117c2190c0d6dec847a8a3c91834dda33481cca16ef6467b4358c"
+    },
+    {
+      "path": "lib/delivery.js",
+      "size": 4241,
+      "sha256": "c55a5edd8cdbf19ca1fe4606c8eb764d95f48b0013b2c8aff179f785092552cd"
+    },
+    {
+      "path": "lib/inventory.js",
+      "size": 1569,
+      "sha256": "fe79c6b7ef66379ea9f903057ac4c48ca0336ffecf6bcbf4681c0e3d0dcdc91a"
+    },
+    {
+      "path": "lib/moduleHookRegistry.js",
+      "size": 3191,
+      "sha256": "1733e373ba37d4dedbed283233ff9484ce01df009586e733b23697973ca62a6e"
+    },
+    {
+      "path": "lib/moduleTargetCache.js",
+      "size": 432,
+      "sha256": "771bc92052d3cd3ad03cd3367fd2ff1125ee3e2f118223535236412e1b592d4d"
+    },
+    {
+      "path": "lib/reviewed.json",
+      "size": 1752,
+      "sha256": "d814d8000087076e27d11423d154bece1f6ff1cb119e75ab551994dc26eabfdf"
+    },
+    {
+      "path": "lib/rpc.js",
+      "size": 3410,
+      "sha256": "004fc6af8747cfbae62b6e4f77e5054d60331ceb3e80c13533ac1b1ebb808df6"
+    },
+    {
+      "path": "lib/service.js",
+      "size": 6260,
+      "sha256": "9865783d8c0f4a3e09e2a4a3fbbb4c88a319f5270ff5094e0c1a6d17fa61bf2e"
+    },
+    {
+      "path": "lib/store.js",
+      "size": 3388,
+      "sha256": "bfcf52eae418440c873ea7c93e5c5129809beb6ea688ae8e35db0867588f1017"
+    },
+    {
+      "path": "loader.js",
+      "size": 4591,
+      "sha256": "7a728dbe65eecd4162b080e9c7c6c7e6f097f58fc4e5e41fde71297fc5786860"
+    }
+  ]
+}

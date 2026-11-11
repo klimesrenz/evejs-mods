@@ -1,17 +1,25 @@
 {
-  "upstream": "evejs-core dbcd89a79 (261018.1)",
+  "upstream": "evejs-core commit e7b2f092eff3cf6ecd7838ee899b08c438707eff (compatibility 261108.1; evejsFork build 261109.1)",
+  "identity": {
+    "evejsVersion": "261108.1",
+    "evejsFork": {
+      "repository": "erooku/evejs-core",
+      "buildVersion": "261109.1",
+      "baseVersion": "261108.1"
+    }
+  },
   "files": {
-    "server/src/services/inventory/itemStore.js": "5e009f53c3f1176457369927d0e4ad1efd2cbc48be1e933bf561722bef165755",
-    "server/src/services/character/characterState.js": "bac2a06ee0e3218c7427875f6d78e3c8733227caab8925ee49c184173b1a1a4e",
-    "server/src/services/planet/planetStaticData.js": "07d7b6e2f2b78b384440588860bd30f3c21d7afcb7fb6b584956cf788693a790",
-    "server/src/services/planet/planetMgrService.js": "bf52974aa014001c1076061c28b308427bf74f2218972ea31a06e365bb40c11a",
+    "server/src/services/inventory/itemStore.js": "11b371c8210a0f111b9d6673e6b908174e4027513230f87fc54ad26fb299fc77",
+    "server/src/services/character/characterState.js": "eef1b48d39aaa9f75480539de259c151aaa0eddf4865a79adcf21374e3a5ea31",
+    "server/src/services/planet/planetStaticData.js": "c991830beb6ff6433526da6b005ddeef1d89aca536858d14f8c02e18cbf72498",
+    "server/src/services/planet/planetMgrService.js": "cfe7be43b3d8413c6855974fce3f3ea9308d7baf109a63f7973e7ae58435b8d7",
     "server/src/services/structure/structureLocation.js": "c80fbb01eab7a7b43d089a69c0a371761489f18ed70dbf5ec5d7461fd64eca17",
-    "server/src/services/structure/structureState.js": "86350cc1cf98b7657dfcac0f2d257053514b45e50c6ec0e80e54ee4965baaf8e",
+    "server/src/services/structure/structureState.js": "e12d487e9e2e0e5486ce03a60b1178eaadc5a74c0be39813b026f16206376c1c",
     "server/src/space/worldData.js": "923446d2988e237c62a12d6f2cc156491aa4a417203a38a1e2afc4e8d752eca4",
-    "server/src/network/tcp/handshake.js": "c84cffe20c00cf075a97daa31ca53c435af4f14c814e46d828760dbbb55fb566",
-    "server/src/network/tcp/utils/marshal.js": "c1dfca2fc1671fd85f03d248ab116e04e8adeb238b677278ba587f22f0a24696",
-    "server/src/services/chat/chatCommands.js": "66499d8b1987b5b241a0c2b29726e45c4fe5421462f08b187ac2fded70224763",
-    "server/src/_secondary/chat/chatRuntime.js": "6369bbe65fcbbf51449a334c3cbbaa4a1135316b5c20bb89bff7dab336a1b916",
+    "server/src/network/tcp/handshake.js": "5e6d7445213c89c8ad58d58ace38ac1f08d6ebfb40f7ef7c4a2491626a8dab15",
+    "server/src/network/tcp/utils/marshal.js": "1386060fc712b3a23b7968da51c51955f76341b42e2e162502e03a050f267df3",
+    "server/src/services/chat/chatCommands.js": "76a15b7bc675bbe1cae7541b44362fb9449eb29a984f34ce0fd143cd33806239",
+    "server/src/_secondary/chat/chatRuntime.js": "27712ad8b62ae0cd3dea39687700a0de180867c72f8254d14d15e63bc16ce200",
     "server/src/services/_shared/sessionIdentity.js": "8959c3279f60d111ff0a8b4096808cd3d91caeafb83b801c9005976ad5a1333a"
   }
 }

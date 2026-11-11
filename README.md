@@ -1,7 +1,7 @@
 # EveJS Mods
 
 Моды для нативного EveJS Launcher: **Skyhook PI**, **Market Search** и **PI Processing**.
-Skyhook PI 0.1.14, Market Search 0.1.6 и PI Processing 0.1.4 требуют Launcher 1.0.74. Node.js — 24.
+Skyhook PI 0.1.17, Market Search 0.1.6 и PI Processing 0.1.7 требуют Launcher 1.0.74. Node.js — 24.
 
 | Мод | Назначение | Инструкция |
 | --- | --- | --- |
@@ -23,7 +23,7 @@ Skyhook PI 0.1.14, Market Search 0.1.6 и PI Processing 0.1.4 требуют Lau
 
 Версии EVE.js в manifest — предварительный фильтр. Helper дополнительно проверяет изученные исходники сервера; неизвестный build может быть отклонён даже при совпадении номера версии. Не обходите проверку.
 
-Базовая работа ранних Skyhook PI и Market Search подтверждена пользователем на Windows. Skyhook PI 0.1.14, Market Search 0.1.6 и PI Processing 0.1.4 автоматически проверены по контрактам EveJS 261018.1; игровая приёмка новых PI-пакетов ещё не выполнена. Пограничные игровые сценарии требуют отдельной приёмки.
+Базовая работа ранних Skyhook PI и Market Search подтверждена пользователем на Windows. Skyhook PI 0.1.17 и PI Processing 0.1.7 автоматически проверены по контрактам EveJS 261108.1; Market Search 0.1.6 сохраняет совместимость с EveJS 261018.1. Игровая приёмка новых PI-пакетов ещё не выполнена. Пограничные игровые сценарии требуют отдельной приёмки.
 
 В репозитории только моды и упаковщик. Сервер EVE.js, клиент EVE, игровые базы, токены, конфиги и логи не включены. PI-склад хранится в установке EVE.js отдельно: `_local/mods/skyhook-pi/state.sqlite`. Обновление пакета не требует удаления склада.
 
@@ -35,7 +35,7 @@ Python 3.10+, без внешних зависимостей:
 python tools/build_release.py
 ```
 
-Результат в `dist/`: ZIP каждого мода, соответствующий `.update.json` и `SHA256SUMS.txt`. Метаданные строятся из manifest, включённого в финальный ZIP.
+Результат в `dist/`: ZIP каждого мода, соответствующий `.update.json` и `SHA256SUMS.txt`. Для PI Processing и Skyhook PI команда вызывает их deterministic allowlist packagers, проверяет versioned top-level root и `SOURCE_SNAPSHOT.json`; `test/` и `scripts/` в устанавливаемый ZIP не попадают. Метаданные строятся из manifest, включённого в финальный ZIP.
 
 Перед новым выпуском согласованно изменить версию manifest, серверного readiness-ответа, клиента и сообщений загрузки, обновить README и release notes. Проверить пакет на копии установки.
 

@@ -1,25 +1,33 @@
 {
-  "upstream": "evejs-core dbcd89a79 (261018.1)",
+  "upstream": "evejs-core commit e7b2f092eff3cf6ecd7838ee899b08c438707eff (compatibility 261108.1; evejsFork build 261109.1)",
+  "identity": {
+    "evejsVersion": "261108.1",
+    "evejsFork": {
+      "repository": "erooku/evejs-core",
+      "buildVersion": "261109.1",
+      "baseVersion": "261108.1"
+    }
+  },
   "files": {
-    "server/src/services/planet/planetOrbitalState.js": "299672e68ff84cc7d5fe3b6de9ee0255e12afcd3e7e13a0f3c27268dc5dca016",
-    "server/src/services/inventory/itemStore.js": "5e009f53c3f1176457369927d0e4ad1efd2cbc48be1e933bf561722bef165755",
-    "server/src/services/planet/planetStaticData.js": "07d7b6e2f2b78b384440588860bd30f3c21d7afcb7fb6b584956cf788693a790",
-    "server/src/services/planet/planetMgrService.js": "bf52974aa014001c1076061c28b308427bf74f2218972ea31a06e365bb40c11a",
+    "server/src/services/planet/planetOrbitalState.js": "b95ae3705e61cb131d47b0eee722cd9c61af749aa686733bd2e43c42789f12c1",
+    "server/src/services/inventory/itemStore.js": "11b371c8210a0f111b9d6673e6b908174e4027513230f87fc54ad26fb299fc77",
+    "server/src/services/planet/planetStaticData.js": "c991830beb6ff6433526da6b005ddeef1d89aca536858d14f8c02e18cbf72498",
+    "server/src/services/planet/planetMgrService.js": "cfe7be43b3d8413c6855974fce3f3ea9308d7baf109a63f7973e7ae58435b8d7",
     "server/src/services/inventory/specialShipHoldRegistry.js": "84c58c94795180cca1431eeaa226611feace9ea0d881813fa940e9cf45bf9238",
-    "server/src/services/corporation/corporationState.js": "710e292b3eb5504925f6fd5ab72cd3f7df92ba02866dc6fc45f54266f5afc757",
-    "server/src/services/corporation/corporationRuntimeState.js": "4ac8fcf81ee1173a74e4cb43b8d28a85ed71bbf3e3277dbc5038964d7e60d7e5",
-    "server/src/services/character/characterState.js": "bac2a06ee0e3218c7427875f6d78e3c8733227caab8925ee49c184173b1a1a4e",
-    "server/src/network/tcp/handshake.js": "c84cffe20c00cf075a97daa31ca53c435af4f14c814e46d828760dbbb55fb566",
-    "server/bootstrap.js": "f333cbd6039277aff8b188eea66145e095fcaaa2483db3d6be61213b9910b437",
-    "server/src/services/planet/skyhookOfficeReplacement.js": "3dfa6e7f568ba015f4a9e6951e7069e887a2d48a1e3ba4a23a979b5c39e99b7e",
+    "server/src/services/corporation/corporationState.js": "ebf2ecf0a9823ce53824d10135d4774e914d5e7359fd5c07fff0dd67aa55c1bb",
+    "server/src/services/corporation/corporationRuntimeState.js": "e434ca01869630bf4522b73a8deebd3b8aae38079552ca5fe4d698332776279e",
+    "server/src/services/character/characterState.js": "eef1b48d39aaa9f75480539de259c151aaa0eddf4865a79adcf21374e3a5ea31",
+    "server/src/network/tcp/handshake.js": "5e6d7445213c89c8ad58d58ace38ac1f08d6ebfb40f7ef7c4a2491626a8dab15",
+    "server/bootstrap.js": "1d8dd5f1442a7b4e0fbaa3b3b848c03394a3581882db949a3b064f80988ca2bc",
+    "server/src/services/planet/skyhookOfficeReplacement.js": "a7960c0a99a7a65977c5bdd9dd5e51f5d2346d0fd6d7239faa1db594a432f03b",
     "server/src/space/worldData.js": "923446d2988e237c62a12d6f2cc156491aa4a417203a38a1e2afc4e8d752eca4",
     "server/src/_secondary/fitting/fittingRuntime.js": "8bd7563a994bd169c068942774b18b9dd0acb04f749f18d2e4d649e7ea88b8a3",
-    "server/src/services/fitting/liveFittingState.js": "7be86ca9577341db115bc25c524c67f6893a6aad3066f74b642fc87f79470808",
-    "server/src/space/runtime.js": "b9ae8bfbad62e8d7915fab13588585578da4001f16216cca2c651d12b8e6af8b",
-    "server/src/services/ship/cargoContainerRuntime.js": "501c1d943125c31d51ba9628b3bf9ee6d7897574cde219864c06c5a10dc9697f",
-    "server/src/network/tcp/utils/marshal.js": "c1dfca2fc1671fd85f03d248ab116e04e8adeb238b677278ba587f22f0a24696",
-    "server/src/services/chat/chatCommands.js": "66499d8b1987b5b241a0c2b29726e45c4fe5421462f08b187ac2fded70224763",
-    "server/src/_secondary/chat/chatRuntime.js": "6369bbe65fcbbf51449a334c3cbbaa4a1135316b5c20bb89bff7dab336a1b916",
+    "server/src/services/fitting/liveFittingState.js": "ed86af894d1e2788513c8a2ab934d28c12b90e2393c40afe112f48ae788ce0ad",
+    "server/src/space/runtime.js": "7e6d7d7359a533a3065db08d9ef683ed7407899dcd4efef28a85721edceb6225",
+    "server/src/services/ship/cargoContainerRuntime.js": "b54b807963810e6e8e7d31ac65232d257e520aac12ec005970b85f751a319352",
+    "server/src/network/tcp/utils/marshal.js": "1386060fc712b3a23b7968da51c51955f76341b42e2e162502e03a050f267df3",
+    "server/src/services/chat/chatCommands.js": "76a15b7bc675bbe1cae7541b44362fb9449eb29a984f34ce0fd143cd33806239",
+    "server/src/_secondary/chat/chatRuntime.js": "27712ad8b62ae0cd3dea39687700a0de180867c72f8254d14d15e63bc16ce200",
     "server/src/services/_shared/sessionIdentity.js": "8959c3279f60d111ff0a8b4096808cd3d91caeafb83b801c9005976ad5a1333a"
   }
 }

@@ -2,7 +2,7 @@
   "schemaVersion": 3,
   "id": "skyhook-pi",
   "displayName": "Skyhook PI",
-  "version": "0.1.14",
+  "version": "0.1.17",
   "description": "Automatic planet-specific P1 production at player-deployed Skyhooks.",
   "kind": "loader",
   "supportedBackends": [
@@ -14,7 +14,7 @@
   "restart": "game_server",
   "compatibility": {
     "evejsVersions": [
-      "261018.1"
+      "261108.1"
     ]
   },
   "launcherApi": {

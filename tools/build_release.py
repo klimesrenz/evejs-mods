@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import subprocess
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -15,7 +16,53 @@ MODS = {
 }
 
 
+def build_deterministic(name, pattern, prefix):
+    source = ROOT / 'mods' / name
+    manifest = json.loads((source / 'evejs-launcher.mod.json').read_text(encoding='utf-8'))
+    expected = dict(provider='github', repository=REPOSITORY, asset=pattern,
+                    channel='stable', tagPrefix=prefix, preserveFiles=[])
+    if manifest['id'] != name or manifest['schemaVersion'] != 3 or manifest['updates'] != expected:
+        raise ValueError('Unexpected package identity or update source: ' + name)
+    version = manifest['version']
+    if not re.fullmatch(r'(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)', version):
+        raise ValueError('Use a stable semantic version: ' + name)
+    output = ROOT / 'dist'
+    output.mkdir(exist_ok=True)
+    archive = output / pattern.replace('{version}', version)
+    sidecar = archive.with_suffix('.update.json')
+    if archive.exists() or sidecar.exists():
+        raise FileExistsError('Release already built; review/remove dist files before rebuilding: ' + archive.name)
+    script = source / 'scripts' / 'package.js'
+    subprocess.run(['node', str(script), 'snapshot'], cwd=ROOT, check=True)
+    subprocess.run(['node', str(script), 'build', str(archive)], cwd=ROOT, check=True)
+    subprocess.run(['node', str(script), 'verify', str(archive)], cwd=ROOT, check=True)
+    root = archive.stem + '/'
+    with zipfile.ZipFile(archive) as package:
+        if package.testzip() is not None:
+            raise ValueError('Invalid ZIP')
+        names = package.namelist()
+        if not names or any(not entry.startswith(root) for entry in names):
+            raise ValueError('Package must have one versioned top-level root: ' + name)
+        if any('/test/' in entry or '/scripts/' in entry for entry in names):
+            raise ValueError('Package contains development files: ' + name)
+        if root + 'SOURCE_SNAPSHOT.json' not in names:
+            raise ValueError('Package source snapshot is missing: ' + name)
+        data = json.loads(package.read(root + 'evejs-launcher.mod.json'))
+        if root + data['clientMenu']['entrypoint'] not in names:
+            raise ValueError('Missing client menu entrypoint')
+    metadata = dict(schemaVersion=1, id=data['id'], version=data['version'], asset=archive.name)
+    versions = data.get('compatibility', {}).get('evejsVersions')
+    if versions is not None:
+        metadata['evejsVersions'] = versions
+    with sidecar.open('x', encoding='utf-8', newline='\n') as stream:
+        json.dump(metadata, stream, ensure_ascii=False, indent=2)
+        stream.write('\n')
+    return archive, sidecar
+
+
 def build(name, pattern, prefix):
+    if name in {'pi-processing', 'skyhook-pi'}:
+        return build_deterministic(name, pattern, prefix)
     source = ROOT / 'mods' / name
     manifest = json.loads((source / 'evejs-launcher.mod.json').read_text(encoding='utf-8'))
     expected = dict(provider='github', repository=REPOSITORY, asset=pattern,
