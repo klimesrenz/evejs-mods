@@ -1,0 +1,47 @@
+"use strict";
+const test=require("node:test");
+const assert=require("node:assert/strict");
+const fs=require("node:fs"),os=require("node:os"),path=require("node:path");
+const packaging=require("../scripts/package");
+const root=path.resolve(__dirname,"..");
+const required=["README.md","PROVENANCE.md","THIRD_PARTY_NOTICES.md","evejs-launcher.mod.json","helper.js","inspect.cjs","loader.js","client/companion.py","client/menu.py","lib/authority.js","lib/catalogue.js","lib/compatibility.js","lib/delivery.js","lib/fault.js","lib/lifecycle.js","lib/moduleHookRegistry.js","lib/moduleTargetCache.js","lib/orbitals.js","lib/production.js","lib/reviewed.json","lib/rpc.js","lib/service.js","lib/store.js"];
+
+test("Skyhook package allowlist covers the complete runtime and documentation",()=>{
+ const files=packaging.loadAllowlist();
+ for(const relative of required)assert.ok(files.includes(relative),relative);
+ assert.equal(new Set(files).size,files.length);
+ assert.equal(path.basename(packaging.defaultOutput()),"SkyhookPI-0.1.17.zip");
+});
+
+test("Skyhook package builder is deterministic and verifier authenticates every entry",t=>{
+ const tmp=fs.mkdtempSync(path.join(os.tmpdir(),"skyhook-package-"));t.after(()=>fs.rmSync(tmp,{recursive:true,force:true}));
+ packaging.writeSnapshot();
+ const first=packaging.buildPackage(path.join(tmp,"a.zip"));
+ const second=packaging.buildPackage(path.join(tmp,"b.zip"));
+ assert.equal(first.sha256,second.sha256);assert.deepEqual(fs.readFileSync(first.output),fs.readFileSync(second.output));
+ const verified=packaging.verifyPackage(first.output);
+ assert.equal(verified.sha256,first.sha256);assert.equal(verified.root,"SkyhookPI-0.1.17/");
+ assert.equal(verified.manifest.id,"skyhook-pi");assert.equal(verified.manifest.version,"0.1.17");assert.equal(verified.snapshot.mod.id,"skyhook-pi");assert.equal(verified.snapshot.core.commit,"e7b2f092eff3cf6ecd7838ee899b08c438707eff");
+});
+
+test("Skyhook package safety rejects escapes, secrets, logs, databases and aliases",t=>{
+ for(const bad of ["../x","/abs","C:/abs","config/.env","token.secret","server.log","state.sqlite","cache.db","x\\y"])
+  assert.throws(()=>packaging.validateRelativePath(bad),/refused|invalid|forbidden/i,bad);
+ const tmp=fs.mkdtempSync(path.join(os.tmpdir(),"skyhook-alias-"));t.after(()=>fs.rmSync(tmp,{recursive:true,force:true}));
+ const outside=fs.mkdtempSync(path.join(os.tmpdir(),"skyhook-outside-"));t.after(()=>fs.rmSync(outside,{recursive:true,force:true}));
+ fs.writeFileSync(path.join(outside,"payload.js"),"x\r\ny\r\n");
+ try{fs.symlinkSync(outside,path.join(tmp,"alias"),"junction");assert.throws(()=>packaging.readAllowedFile(tmp,"alias/payload.js"),/alias|regular|refused/i);}catch(error){if(error.code!=="EPERM")throw error;}
+ assert.equal(packaging.normalizeText(Buffer.from("x\r\ny\r\n")).toString(),"x\ny\n");
+});
+
+test("Skyhook packager rejects source clobbering and duplicate JSON keys",()=>{
+ packaging.writeSnapshot();
+ assert.throws(()=>packaging.buildPackage(path.join(root,"README.md")),/inside source root refused/i);
+ assert.throws(()=>packaging.parseJsonUnique('{"version":"1","version":"2"}',"fixture"),/duplicate key/i);
+});
+
+test("Skyhook verifier rejects archive byte tampering",t=>{
+ const tmp=fs.mkdtempSync(path.join(os.tmpdir(),"skyhook-tamper-"));t.after(()=>fs.rmSync(tmp,{recursive:true,force:true}));
+ packaging.writeSnapshot();const built=packaging.buildPackage(path.join(tmp,"good.zip"));const data=fs.readFileSync(built.output);data[100]^=1;const bad=path.join(tmp,"bad.zip");fs.writeFileSync(bad,data);
+ assert.throws(()=>packaging.verifyPackage(bad),/CRC|hash|snapshot|archive|invalid/i);
+});

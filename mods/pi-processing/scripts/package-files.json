@@ -1,0 +1,22 @@
+[
+  "PROVENANCE.md",
+  "README.md",
+  "THIRD_PARTY_NOTICES.md",
+  "client/companion.py",
+  "client/menu.py",
+  "evejs-launcher.mod.json",
+  "helper.js",
+  "lib/authority.js",
+  "lib/catalogue.js",
+  "lib/chain.js",
+  "lib/compatibility.js",
+  "lib/delivery.js",
+  "lib/inventory.js",
+  "lib/moduleHookRegistry.js",
+  "lib/moduleTargetCache.js",
+  "lib/reviewed.json",
+  "lib/rpc.js",
+  "lib/service.js",
+  "lib/store.js",
+  "loader.js"
+]

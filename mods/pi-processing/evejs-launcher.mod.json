@@ -2,7 +2,7 @@
   "schemaVersion": 3,
   "id": "pi-processing",
   "displayName": "PI Processing",
-  "version": "0.1.4",
+  "version": "0.1.7",
   "description": "Station and structure PI processing with persistent offline jobs.",
   "kind": "loader",
   "supportedBackends": [
@@ -14,7 +14,7 @@
   "restart": "game_server",
   "compatibility": {
     "evejsVersions": [
-      "261018.1"
+      "261108.1"
     ]
   },
   "launcherApi": {

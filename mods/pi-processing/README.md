@@ -1,4 +1,4 @@
-# Переработка PI 0.1.4
+# Переработка PI 0.1.7
 
 Отдельное окно Mods для производства P2–P4 из материалов личного ангара.
 Можно использовать P1 со Skyhook PI или купленные материалы. Чертежи,
@@ -45,13 +45,14 @@ CCP SDE 3396210 это 1 час для P2, 2 часа для P3 и 3 часа д
 
 ## Установка и проверка на Windows
 
-Требуется Native EVE.js 261018.1, Node.js 24+, Launcher 1.0.74+.
+Требуется Native EVE.js compatibility identity 261108.1, Node.js 24+, Launcher 1.0.74+.
 Helper дополнительно проверяет конкретные исходники. Неизвестный build
-отклоняется; guard не отключать.
+отклоняется; принимаются только fingerprints fork build 261109.1, commit
+`e7b2f092eff3cf6ecd7838ee899b08c438707eff`. Guard не отключать.
 Файл `lib/reviewed.json` содержит нормализованные SHA-256 изученных файлов.
 
 1. Остановить игровой сервер, закрыть EVE-клиенты.
-2. Launcher → Mods → Add ZIP → `PIProcessing-0.1.4.zip` → Enable.
+2. Launcher → Mods → Add ZIP → `PIProcessing-0.1.7.zip` → Enable.
 3. Запустить сервер и клиент; открыть окно из общего меню Mods.
 4. На первой проверке запустить 1 партию доступного P2-рецепта. Сверить списание
    всех материалов. Перезапустить сервер до завершения, дождаться таймера,
@@ -114,3 +115,31 @@ Start потребует нового расчёта; подтверждённы
 
 Совместимость со старыми ветками 0.12.x этим пакетом не заявляется. Формат базы
 заданий и рецепты не изменились.
+
+## Поддержка EveJS 261028.1 / fork build 261029.1: 0.1.5
+
+Пакет проверен по host-контрактам текущего EveJS Core fork build `261029.1`,
+основанного на commit `3df5c95ded835605a837229ad4e3eb730929ca58`, при
+compatibility identity root/server `261028.1`. Повторно изучены семь изменившихся
+guarded-файлов: атомарное списание и durable receipt в item store, inventory
+notification, расширение PlanetMgr RPC, доступ к структуре, marshal packet hook и
+оба chat entrypoint. Их используемые модом сигнатуры и границы сохранились;
+изменения Core усиливают authority и добавляют независимые runtime-функции.
+Transform item store применяется к LF и CRLF одинаково и компилируется на точном
+fork build 261029.1. Формат базы заданий и рецепты не изменились.
+
+## Поддержка EveJS 261108.1 / fork build 261109.1: 0.1.7
+
+Пакет ограничен Core `261108.1`, fork build `261109.1`, commit
+`e7b2f092eff3cf6ecd7838ee899b08c438707eff`; guarded hashes находятся в
+`lib/reviewed.json`, происхождение — в `PROVENANCE.md`.
+
+Списание входов переведено с compiler transform `itemStore` на штатный Core
+`exchangeInventoryItemStacksIdempotent(requests, [], options)`. Пустой список
+выходов важен: Core атомарно списывает P1 и durable receipt, но готовый продукт
+по-прежнему не выдаётся до завершения сохранённого таймера. Отдельная выдача и
+receipt recovery сохранены. Loader больше не устанавливает itemStore compile hook.
+
+Source-only tests покрывают duplicate receipt, конфликт fingerprint и
+authoritative absence, а также LF/CRLF guards. Формат SQLite, рецепты и уже
+запущенные delayed jobs не изменены.

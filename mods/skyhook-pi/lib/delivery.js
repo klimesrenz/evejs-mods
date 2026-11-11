@@ -7,13 +7,10 @@ const MAX_COMBINED_BYTES = 512 * 1024;
 // The reviewed original/native login envelope used by AutoMining too. Source
 // files are only read; no compiler hook and no client code.ccp patch is needed.
 const HANDSHAKE_HASHES = new Set([
-  "24a36b919dffb439d0030f25601655fa0402f196c6379064390870268e6b046f",
-  "6305a9abe3e555ae845b0c9a27ed6d5bd08bba0e903eaf3789c3756b935fbbfd",
-  "4fc3c37ec83c443c1497a3daba57d7157d05bbe55af3be2d5545b6162398ebc9",
-  "c84cffe20c00cf075a97daa31ca53c435af4f14c814e46d828760dbbb55fb566",
+  "5e6d7445213c89c8ad58d58ace38ac1f08d6ebfb40f7ef7c4a2491626a8dab15",
 ]);
 function validateRoot(root) {
-  const source = fs.readFileSync(path.join(root, "server/src/network/tcp/handshake.js"), "utf8").replace(/\r\n/g, "\n");
+  const source = fs.readFileSync(path.join(root, "server/src/network/tcp/handshake.js"), "utf8").split(String.fromCharCode(13, 10)).join("\n");
   const hash = crypto.createHash("sha256").update(source).digest("hex");
   if (!HANDSHAKE_HASHES.has(hash)) throw Error(`Unreviewed handshake.js (${hash}); Skyhook PI left inactive.`);
   for (const file of ["server/src/network/tcp/utils/marshal.js", "server/src/services/market/marketProxyService.js", "server/src/services/chat/chatCommands.js", "server/src/space/worldData.js"]) {
@@ -53,10 +50,10 @@ function installPacketHook(exports, compose) {
     // buildTidiSignedFunc, including any AutoMining additions, in either order.
     const entries = value?.[3]?.entries;
     if (Array.isArray(value) && value.length === 4 && value[0] === "" &&
-        Array.isArray(value[1]) && value[1].length === 2 && value[1][1] === false &&
+        Array.isArray(value[1]) && value[1].length === 2 && value[1][1] === 0 &&
         value[2]?.type === "dict" && value[3]?.type === "dict" && Array.isArray(entries) &&
         entries.some(pair => pair[0] === "challenge_responsehash") && entries.some(pair => pair[0] === "macho_version")) {
-      try { value = [value[0], [compose(value[1][0]), false], value[2], value[3]]; }
+      try { value = [value[0], [compose(value[1][0]), value[1][1]], value[2], value[3]]; }
       catch (error) { console.error(`[SkyhookPI] UI delivery skipped: ${error.message}`); }
     }
     return original.call(this, value, ...rest);
